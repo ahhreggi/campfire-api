@@ -12,7 +12,7 @@ DROP TABLE IF EXISTS courses CASCADE;
 DROP TABLE IF EXISTS enrolments CASCADE;
 
 CREATE TYPE "roles" AS ENUM (
-  'user',
+  'student',
   'instructor'
 );
 
@@ -28,11 +28,7 @@ CREATE TABLE "users" (
   "created_at" timestamp DEFAULT (now()),
   "dark_mode" boolean DEFAULT true,
   "bio" text,
-  "slack_username" text,
-  "github_username" text,
-  "discord_id" text,
-  "linkedin_url" text,
-  "website_url" text
+  "socials" jsonb
 );
 
 CREATE TABLE "posts" (
