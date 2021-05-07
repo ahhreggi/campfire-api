@@ -23,7 +23,11 @@ router.post("/register", (req, res) => {
     .then((result) => {
       if (result.length > 0) {
         // Save was successful
-        const token = jwt.sign({ id: result.id }, process.env.JWT_SECRET_KEY);
+        console.log("Saving user, result.id: ", result[0].id);
+        const token = jwt.sign(
+          { id: result[0].id },
+          process.env.JWT_SECRET_KEY
+        );
         res.status(200).send({ token, email });
       } else {
         res.status(400).send();
@@ -35,8 +39,6 @@ router.post("/register", (req, res) => {
 // Log a user in
 // If successful, returns a token and user's email
 router.post("/login", (req, res) => {
-  // TODO: check user is not currently logged in
-
   // Check we have email and password
   const { email, password } = req.body;
   if (!email || !password) {

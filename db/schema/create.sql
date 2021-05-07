@@ -13,7 +13,8 @@ DROP TABLE IF EXISTS enrolments CASCADE;
 
 CREATE TYPE "roles" AS ENUM (
   'student',
-  'instructor'
+  'instructor',
+  'owner'
 );
 
 CREATE TABLE "users" (
@@ -90,7 +91,6 @@ CREATE TABLE "avatars" (
 
 CREATE TABLE "courses" (
   "id" SERIAL PRIMARY KEY,
-  "creator_id" int,
   "name" text,
   "description" text,
   "student_access_code" text UNIQUE,
@@ -136,8 +136,6 @@ ALTER TABLE "post_tags" ADD FOREIGN KEY ("post_id") REFERENCES "posts" ("id");
 ALTER TABLE "bookmarks" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 
 ALTER TABLE "bookmarks" ADD FOREIGN KEY ("post_id") REFERENCES "posts" ("id");
-
-ALTER TABLE "courses" ADD FOREIGN KEY ("creator_id") REFERENCES "users" ("id");
 
 ALTER TABLE "enrolments" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 

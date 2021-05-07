@@ -8,17 +8,23 @@ INSERT INTO users (first_name, last_name, email, password) VALUES
 ('Gerald', 'George', 'hello7@campfire.ca', '$2b$10$oMeyV3ebi66lTAL9hAhQJumGirYQkXBM4aDEc2o5ecQLzVflzgkNa'),
 ('Hannah', 'Herbert', 'hello8@campfire.ca', '$2b$10$oMeyV3ebi66lTAL9hAhQJumGirYQkXBM4aDEc2o5ecQLzVflzgkNa');
 
-INSERT INTO courses (creator_id, name, description, student_access_code, instructor_access_code) VALUES
-(1, 'JS for Beginners', 'Introduction to core JavaScript concepts', '111111', '222222'),
-(2, 'Raucous Ruby', 'Introduction to core Ruby concepts', '333333', '444444');
+INSERT INTO courses (name, description, student_access_code, instructor_access_code) VALUES
+('JS for Beginners', 'Introduction to core JavaScript concepts', '111111', '222222'),
+('Raucous Ruby', 'Introduction to core Ruby concepts', '333333', '444444'),
+('Everything HTML', 'Divs, headers, imgs - we''ll learn it all', '555555', '666666');
 
 INSERT INTO enrolments (user_id, course_id, role) VALUES
+(1, 1, 'owner'),
+(2, 2, 'owner'),
+(3, 3, 'owner'),
 (3, 1, 'instructor'),
 (4, 2, 'instructor'),
 (5, 1, 'student'),
 (6, 1, 'student'),
 (7, 2, 'student'),
-(8, 2, 'student');
+(8, 2, 'student'),
+(5, 3, 'student'),
+(8, 3, 'student');
 
 INSERT INTO tags (course_id, name) VALUES 
 (1, 'Callbacks'),
