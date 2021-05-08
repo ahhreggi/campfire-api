@@ -10,15 +10,15 @@ const db = require("../index");
  * @returns {Promise} Promise that resolves to true if user was saved successfully.
  */
 const createUser = function (user) {
-  const { firstName, lastName, email, password } = user;
+  const { firstName, lastName, email, password, avatarId } = user;
   return db
     .query(
       `
-    INSERT INTO users (first_name, last_name, email, password)
-    VALUES ($1, $2, $3, $4)
-    RETURNING email, id;
+    INSERT INTO users (first_name, last_name, email, password, avatar_id)
+    VALUES ($1, $2, $3, $4, $5)
+    RETURNING email, first_name, last_name, avatar_id;
   `,
-      [firstName, lastName, email, password]
+      [firstName, lastName, email, password, avatarId]
     )
     .then((res) => res.rows);
 };

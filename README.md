@@ -40,9 +40,9 @@ Response object:
   {
     token: string, // JWT
     email: string, // user's email
-    firstName: string, // TODO: user's first name
-    lastName: string, // TODO: user's last name
-    avatarUrl: string, // TODO: user's avatar url
+    firstName: string, // user's first name
+    lastName: string, // user's last name
+    avatarId: string, // user's avatar id
   }
 ```
 
@@ -68,9 +68,9 @@ Response object:
   {
     token: string, // JWT
     email: string, // user's email
-    firstName: string, // TODO: user's first name
-    lastName: string, // TODO: user's last name
-    avatarUrl: string, // TODO: user's avatar url
+    firstName: string, // user's first name
+    lastName: string, // user's last name
+    avatarId: string, // user's avatar id
   }
 ```
 

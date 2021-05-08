@@ -7,7 +7,6 @@ DROP TABLE IF EXISTS comment_likes CASCADE;
 DROP TABLE IF EXISTS tags CASCADE;
 DROP TABLE IF EXISTS post_tags CASCADE;
 DROP TABLE IF EXISTS bookmarks CASCADE;
-DROP TABLE IF EXISTS avatars CASCADE;
 DROP TABLE IF EXISTS courses CASCADE;
 DROP TABLE IF EXISTS enrolments CASCADE;
 
@@ -85,11 +84,6 @@ CREATE TABLE "bookmarks" (
   "last_visited" timestamp DEFAULT (now())
 );
 
-CREATE TABLE "avatars" (
-  "id" SERIAL PRIMARY KEY,
-  "url" text
-);
-
 CREATE TABLE "courses" (
   "id" SERIAL PRIMARY KEY,
   "name" text,
@@ -110,8 +104,6 @@ CREATE TABLE "enrolments" (
   "enrolled" boolean DEFAULT true,
   UNIQUE ("user_id", "course_id")
 );
-
-ALTER TABLE "users" ADD FOREIGN KEY ("avatar_id") REFERENCES "avatars" ("id");
 
 ALTER TABLE "posts" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 
