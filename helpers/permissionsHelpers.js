@@ -1,3 +1,4 @@
+// Determines if a given user has edit permissions on a given post
 const editable = function (role, posterRole, userId, posterId) {
   // admins can edit any post
   if (role === "admin") return true;
