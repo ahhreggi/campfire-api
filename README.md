@@ -15,3 +15,9 @@
 
 - req.body = { email, password }
 - response = { token, email }
+
+### Courses
+
+`/api/courses`: Returns a list of the users courses
+
+`/api/courses/:id`: Returns all posts and analytics data for a given course
