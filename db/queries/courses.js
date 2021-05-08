@@ -5,16 +5,38 @@ const getCoursesForUser = function (userId) {
   return db
     .query(
       `
-    SELECT courses.id as id, name, courses.created_at as created_at, courses.archived as archived, enrolments.role as role
-    FROM courses
-    JOIN enrolments ON course_id = courses.id
-    JOIN users ON user_id = users.id
-    WHERE users.id = $1
-    AND courses.active = true;
+    SELECT is_admin FROM users WHERE id = $1
   `,
       [userId]
     )
-    .then((res) => res.rows);
+    .then((res) => {
+      if (res.rows[0].is_admin) {
+        // if user is admin they get all courses
+        return db
+          .query(
+            `
+          SELECT courses.id as id, name, courses.created_at as created_at, courses.archived as archived, 'admin' as role
+          FROM courses
+          WHERE courses.active = true;
+        `
+          )
+          .then((res) => res.rows);
+      } else {
+        return db
+          .query(
+            `
+          SELECT courses.id as id, name, courses.created_at as created_at, courses.archived as archived, enrolments.role as role
+          FROM courses
+          JOIN enrolments ON course_id = courses.id
+          JOIN users ON user_id = users.id
+          WHERE users.id = $1
+          AND courses.active = true;
+        `,
+            [userId]
+          )
+          .then((res) => res.rows);
+      }
+    });
 };
 
 const getCourseByAccessCode = function (accessCode) {
@@ -254,21 +276,15 @@ const getCourseById = function (id, userId) {
       delete compiledCourseData.secrets;
       compiledCourseData.posts = compiledCourseData.posts.map((post) => {
         if (post.anonymous) {
-          delete post.author_first_name;
-          delete post.author_last_name;
-          post.author_avatar_id = 1;
+          post = anonymize(post);
         }
         post.comments = post.comments.map((comment) => {
           if (comment.anonymous) {
-            delete comment.author_first_name;
-            delete comment.author_last_name;
-            comment.author_avatar_id = 1;
+            comment = anonymize(comment);
           }
           comment.replies = comment.replies.map((reply) => {
             if (reply.anonymous) {
-              delete reply.author_first_name;
-              delete reply.author_last_name;
-              reply.author_avatar_id = 1;
+              reply = anonymize(reply);
             }
             return reply;
           });
@@ -280,6 +296,14 @@ const getCourseById = function (id, userId) {
 
     return Promise.resolve(compiledCourseData);
   });
+};
+
+// helper function -- strips author name and avatar from posts/comments/replies
+const anonymize = function (obj) {
+  delete obj.author_first_name;
+  delete obj.author_last_name;
+  obj.author_avatar_id = 1;
+  return obj;
 };
 
 module.exports = {
