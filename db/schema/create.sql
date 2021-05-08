@@ -44,7 +44,7 @@ CREATE TABLE "posts" (
   "anonymous" boolean DEFAULT false,
   "active" boolean DEFAULT true,
   "pinned" boolean DEFAULT false,
-  "views" int
+  "views" int DEFAULT 0
 );
 
 CREATE TABLE "comments" (
