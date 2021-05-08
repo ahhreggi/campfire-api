@@ -21,7 +21,8 @@ router.get("/courses/:id", isAuthenticated, (req, res) => {
     .then((courseIds) => courseIds.includes(courseId))
     .then((hasAccess) => {
       if (hasAccess) return getCourseById(courseId, id);
-    });
+    })
+    .then((courseData) => res.send(courseData));
 });
 
 module.exports = router;

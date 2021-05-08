@@ -14,7 +14,8 @@ DROP TABLE IF EXISTS enrolments CASCADE;
 CREATE TYPE "roles" AS ENUM (
   'student',
   'instructor',
-  'owner'
+  'owner',
+  'admin'
 );
 
 CREATE TABLE "users" (
