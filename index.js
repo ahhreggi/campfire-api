@@ -19,5 +19,5 @@ app.use("/api", userRoutes);
 app.use("/api", courseRoutes);
 
 app.listen(PORT, () => {
-  console.log("Campfire API running on http://localhost:3000");
+  console.log(`Campfire API running on PORT ${PORT}!`);
 });
