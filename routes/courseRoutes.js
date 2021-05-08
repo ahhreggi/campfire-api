@@ -15,6 +15,10 @@ router.post("/join", isAuthenticated, (req, res) => {
   const { id } = res.locals.decodedToken;
   const { accessCode } = req.body;
 
+  if (!accessCode) {
+    return res.status(400).send({ message: "Access code is required" });
+  }
+
   getCourseByAccessCode(accessCode).then((result) => {
     if (!result) {
       return res.status(400).send({ message: "Invalid access code" });
@@ -40,20 +44,23 @@ router.post("/create", isAuthenticated, (req, res) => {
   const { name, description } = req.body;
   const { id } = res.locals.decodedToken;
 
-  // Generate the access codes
-  const studentAccessCode = uuid.v4();
-  const instructorAccessCode = uuid.v4();
+  if (!name) {
+    return res.status(400).send({ message: "Course name is required" });
+  }
 
-  // Insert the new course
-  createCourse({
+  // Generate the access codes
+  const courseData = {
     name,
     description,
-    studentAccessCode,
-    instructorAccessCode,
-  })
+    studentAccessCode: uuid.v4(),
+    instructorAccessCode: uuid.v4(),
+  };
+
+  // Insert the new course
+  createCourse(courseData)
     // Add the user as the course owner
     .then((newCourse) => enrolUserInCourse(id, newCourse.id, "owner"))
-    // Instruct frontend to redirect to course page
+    // Instruct frontend to redirect to new course page
     .then((result) => res.send({ redirect_to: `/courses/${result.course_id}` }))
     .catch((err) => res.status(500).send(err));
 });
