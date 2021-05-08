@@ -5,8 +5,7 @@ const addBookmark = function (userId, postId) {
     .query(
       `
     INSERT INTO bookmarks (user_id, post_id)
-    VALUES ($1, $2)
-    RETURNING *;
+    VALUES ($1, $2);
   `,
       [userId, postId]
     )

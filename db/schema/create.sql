@@ -81,7 +81,8 @@ CREATE TABLE "bookmarks" (
   "id" SERIAL PRIMARY KEY,
   "user_id" int,
   "post_id" int,
-  "last_visited" timestamp DEFAULT (now())
+  "last_visited" timestamp DEFAULT (now()),
+  UNIQUE ("user_id", "post_id")
 );
 
 CREATE TABLE "courses" (

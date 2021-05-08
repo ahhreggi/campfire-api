@@ -273,7 +273,14 @@ Response object:
 
 Add a post to the user's bookmarks.
 
-_TODO_
+Request object:
+
+```js
+  {
+    token: string, // JWT
+    postId: number, // post id to bookmark
+  }
+```
 
 ---
 
