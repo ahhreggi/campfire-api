@@ -1,125 +1,331 @@
 ## Routes
 
-### Debug
+## **Debug**
 
-`/api/debug/reset_db`: Reset the db
+### `GET /api/debug/reset_db`
 
-### User
+Resets and reseeds the database.
 
-`/api/register`: Registers a new user
+---
 
-- req.body = { firstName, lastName, email, password }
-- response = { token, email }
+## **Users**
 
-`/api/login`: Logs a user in
+### `POST /api/register`
 
-- req.body = { email, password }
-- response = { token, email }
+Creates a new user account.
 
-### Courses
+Request object:
 
-`/api/courses`: Returns a list of the users courses
+```js
+  {
+    token: string, // JWT
+    firstName: string, // user's first name
+    lastName: string, // user's last name
+    email: string, // user's email
+    password: string, // user's password
+  }
+```
 
-- response:
+Requirements:
+
+1. email address must not be taken
+
+Response object:
+
+```js
+  {
+    token: string, // JWT
+    email: string, // user's email
+    firstName: string, // TODO: user's first name
+    lastName: string, // TODO: user's last name
+    avatarUrl: string, // TODO: user's avatar url
+  }
+```
+
+---
+
+### `POST /api/login`
+
+Logs in to an existing user.
+
+Request object:
+
+```js
+  {
+    token: string, // JWT
+    email: string, // user's email
+    password: string, // user's password
+  }
+```
+
+Response object:
+
+```js
+  {
+    token: string, // JWT
+    email: string, // user's email
+    firstName: string, // TODO: user's first name
+    lastName: string, // TODO: user's last name
+    avatarUrl: string, // TODO: user's avatar url
+  }
+```
+
+---
+
+## **User Courses**
+
+### `POST /api/join`
+
+Enrols a user in a course.
+
+Request object:
+
+```js
+{
+  token: string, // JWT
+  accessCode: string, // the instructor or student access code for the course
+}
+```
+
+Requirements:
+
+1. user must be logged in
+2. access code must exist & course must be active
+
+Response object:
+
+```js
+{
+  redirect_to: "/courses/:id", // URL for the new course
+}
+```
+
+---
+
+### `POST /api/create`
+
+Creates a new course.
+
+Request object:
+
+```js
+  {
+    token: string, // JWT
+    name: string, // new course name
+    description: string, // new course description (optional)
+  }
+```
+
+Requirements:
+
+1. user must be logged in
+
+Response object:
+
+```js
+{
+  redirect_to: "/courses/:id"; // URL for the new course
+}
+```
+
+---
+
+## Courses
+
+### `GET /api/courses`
+
+Get all courses for the user.
+
+Request object:
+
+```js
+{
+  token: string, // JWT
+}
+```
+
+Response object:
 
 ```js
 [
   {
-    id,
-    name,
-    created_at,
-    archived,
-    role,
+    id: number, // course id
+    name: string, // course name
+    created_at: date, // course creation timestamp
+    archived: boolean, // course archival status
+    role: string, // the user's role within the course
   },
 ];
 ```
 
-`/api/courses/:id`: Returns all posts and analytics data for a given course
+---
 
-- response:
+### `GET /api/courses/:id`
+
+Get data for a specific course.
+
+Request object:
 
 ```js
-{
-  id,
-  name,
-  description,
-  archived,
-  analytics: {
-    user_count,
-    average_response_time, // TODO
-    total_posts,
-    total_comments,
-    num_unresolved_questions, num_resolved_questions
-  },
-  secrets: {
-    // this object is only provided if the req is made by an instructor
-    student_access_code,
-    instructor_access_code,
-  },
-  tags: [
-    {
-      id,
-      name,
-    }
-  ],
-  posts: [
-    {
-      id,
-      title
-      body,
-      bookmarked,
-      created_at,
-      last_modified,
-      best_answer,
-      author_first_name, // users.first_name or undefined (if posts.anonymous = true)
-      author_last_name, // users.last_name or undefined (if posts.anonymous = true)
-      author_avatar_url, // users.avatar_url or undefined (if posts.anonymous = true)
-      role, // student/instructor/owner
-      user_id,
-      editable, // boolean: if current user has permission to edit/delete this
-      tags: [
-        {
-          id,
-          name
-        }
-      ],
-      pinned,
-      views,
-      comments: [
-        {
-          id,
-          anonymous,
-          author_first_name,
-          author_last_name,
-          author_avatar_url,
-          body,
-          score,
-          comment_id,
-          created_at,
-          last_modified,
-          endorsed // boolean (true if there is an entry in the comment_endorsements table for this comment_id)
-          role: // student/instructor/owner
-          user_id,
-          editable, // boolean: if current user has permission to edit/delete this
-          replies: [
-            {
-              id,
-              anonymous,
-              author_first_name,
-              author_last_name,
-              author_avatar_url
-              body,
-              created_at,
-              last_modified,
-              role // student/instructor/owner
-              user_id,
-              editable
-            }
-          ]
-        }
-      ]
-    }
-  ]
-}
-
+  {
+    token: string, // JWT
+  }
 ```
+
+Requirements:
+
+1. user must be logged in
+2. user must be enrolled in the course as a student, instructor, or owner, or be an admin
+
+Response object:
+
+```js
+  {
+    id: number, // course id
+    name: string, // course name
+    description: string, // course description
+    archived: string, // course archival status
+    analytics: {
+      user_count: number, // total users enrolled
+      total_posts: number,
+      total_comments: number,
+      num_unresolved_questions: number, // questions with no 'best_answer'
+      num_resolved_questions: number,
+    },
+    tags: [
+      {
+        id: number, // tag id
+        name: string, // tag name/label
+      }
+    ],
+    posts: [
+      {
+        id: number, // post id
+        title: string,
+        body: string,
+        bookmarked: boolean,
+        created_at: timestamp,
+        last_modifited: timestamp,
+        best_answer: number, // comment_id of the 'best_answer'
+        author_first_name: string, // undefined if post is marked as anonymous and user is not privileged
+        author_last_name: string, // undefined if post is marked as anonymous and user is not privileged
+        author_avatar_url: string, // undefined if post is marked as anonymous and user is not privileged
+        pinned: boolean,
+        views: int, // TODO: total number of times post has been viewed
+        anonymous: boolean, // if poster has request anonymity
+        role: string, // role of the poster (student/instructor/owner/admin)
+        user_id: number,
+        editable: boolean, // whether current user has edit permission on this post
+        tags: [
+          {
+            id: number,
+            name: string,
+          }
+        ],
+        comments: [
+          {
+            id: number,
+            post_id: number,
+            anonymous: boolean,
+            author_first_name: string,
+            author_last_name: string,
+            author_avatar_url: string,
+            body: string,
+            score: number,
+            created_at: timestamp,
+            last_modified: timestamp,
+            endorsed: boolean,
+            role: string,
+            user_id: number,
+            editable: boolean,
+            replies: [
+              {
+                id: number,
+                parent_id: number,
+                anonymous: boolean,
+                author_first_name: string,
+                author_last_name: string,
+                body: string,
+                created_at: timestamp,
+                last_modified: timestamp,
+                role: string,
+                user_id: number,
+                editable: boolean,
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+```
+
+---
+
+## Bookmarks
+
+### `POST /api/bookmarks`
+
+Add a post to the user's bookmarks.
+
+_TODO_
+
+---
+
+### `DELETE /api/bookmarks/:id`
+
+Remove a post from the user's bookmarks.
+
+_TODO_
+
+---
+
+## Posts
+
+### `POST /api/posts`
+
+Add a new post.
+
+_TODO_
+
+---
+
+### `PATCH /api/posts/:id`
+
+Edit a post.
+
+_TODO_
+
+---
+
+### `DELETE /api/posts/:id`
+
+Delete a post.
+
+_TODO_
+
+---
+
+## Comments
+
+### `POST /api/comments`
+
+Add a comment to a post.
+
+_TODO_
+
+---
+
+### `PATCH /comments/:id`
+
+Edit a comment of a post.
+
+_TODO_
+
+---
+
+### `DELETE /comments/:id`
+
+Delete a comment.
+
+_TODO_
