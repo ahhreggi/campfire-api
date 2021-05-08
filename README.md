@@ -284,11 +284,18 @@ Request object:
 
 ---
 
-### `DELETE /api/bookmarks/:id`
+### `DELETE /api/bookmarks`
 
 Remove a post from the user's bookmarks.
 
-_TODO_
+Request object:
+
+```js
+  {
+    token: string, // JWT
+    postId: number, // post id to bookmark
+  }
+```
 
 ---
 
