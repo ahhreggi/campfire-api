@@ -33,15 +33,18 @@ it("should return true if its the users own post", () => {
   expect(result4).toBeTruthy();
 });
 
-it("should return true if we have a role equal to or greater than the poster's", () => {
+it("should return true if we have a role greater than the poster's", () => {
   const result1 = editable(INSTRUCTOR, STUDENT, 1, 2);
   expect(result1).toBeTruthy();
 
   const result2 = editable(OWNER, INSTRUCTOR, 1, 2);
   expect(result2).toBeTruthy();
+
+  const result3 = editable(OWNER, STUDENT, 1, 2);
+  expect(result3).toBeTruthy();
 });
 
-it("should return false if it's not the users own post, and they have a lower role than the poster's (or are a student)", () => {
+it("should return false if it's not the users own post, and they have an equal or lower role than the poster's", () => {
   const result1 = editable(STUDENT, STUDENT, 1, 2);
   expect(result1).toBeFalsy();
 
@@ -54,12 +57,18 @@ it("should return false if it's not the users own post, and they have a lower ro
   const result4 = editable(STUDENT, ADMIN, 1, 2);
   expect(result4).toBeFalsy();
 
-  const result5 = editable(INSTRUCTOR, OWNER, 1, 2);
+  const result5 = editable(INSTRUCTOR, INSTRUCTOR, 1, 2);
   expect(result5).toBeFalsy();
 
-  const result6 = editable(INSTRUCTOR, ADMIN, 1, 2);
+  const result6 = editable(INSTRUCTOR, OWNER, 1, 2);
   expect(result6).toBeFalsy();
 
-  const result7 = editable(OWNER, ADMIN, 1, 2);
+  const result7 = editable(INSTRUCTOR, ADMIN, 1, 2);
   expect(result7).toBeFalsy();
+
+  const result8 = editable(OWNER, OWNER, 1, 2);
+  expect(result8).toBeFalsy();
+
+  const result9 = editable(OWNER, ADMIN, 1, 2);
+  expect(result9).toBeFalsy();
 });
