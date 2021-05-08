@@ -1,12 +1,12 @@
-INSERT INTO users (first_name, last_name, email, password) VALUES
-('Aaron', 'Aldridge', 'hello1@campfire.ca', '$2b$10$oMeyV3ebi66lTAL9hAhQJumGirYQkXBM4aDEc2o5ecQLzVflzgkNa'),
-('Becky', 'Black', 'hello2@campfire.ca', '$2b$10$oMeyV3ebi66lTAL9hAhQJumGirYQkXBM4aDEc2o5ecQLzVflzgkNa'),
-('Carson', 'Cool', 'hello3@campfire.ca', '$2b$10$oMeyV3ebi66lTAL9hAhQJumGirYQkXBM4aDEc2o5ecQLzVflzgkNa'),
-('Donna', 'Derby', 'hello4@campfire.ca', '$2b$10$oMeyV3ebi66lTAL9hAhQJumGirYQkXBM4aDEc2o5ecQLzVflzgkNa'),
-('Edward', 'Ecksworth', 'hello5@campfire.ca', '$2b$10$oMeyV3ebi66lTAL9hAhQJumGirYQkXBM4aDEc2o5ecQLzVflzgkNa'),
-('Fiona', 'Ford', 'hello6@campfire.ca', '$2b$10$oMeyV3ebi66lTAL9hAhQJumGirYQkXBM4aDEc2o5ecQLzVflzgkNa'),
-('Gerald', 'George', 'hello7@campfire.ca', '$2b$10$oMeyV3ebi66lTAL9hAhQJumGirYQkXBM4aDEc2o5ecQLzVflzgkNa'),
-('Hannah', 'Herbert', 'hello8@campfire.ca', '$2b$10$oMeyV3ebi66lTAL9hAhQJumGirYQkXBM4aDEc2o5ecQLzVflzgkNa');
+INSERT INTO users (first_name, last_name, email, password, avatar_id) VALUES
+('Aaron', 'Aldridge', 'hello1@campfire.ca', '$2b$10$oMeyV3ebi66lTAL9hAhQJumGirYQkXBM4aDEc2o5ecQLzVflzgkNa', 2),
+('Becky', 'Black', 'hello2@campfire.ca', '$2b$10$oMeyV3ebi66lTAL9hAhQJumGirYQkXBM4aDEc2o5ecQLzVflzgkNa', 3),
+('Carson', 'Cool', 'hello3@campfire.ca', '$2b$10$oMeyV3ebi66lTAL9hAhQJumGirYQkXBM4aDEc2o5ecQLzVflzgkNa', 4),
+('Donna', 'Derby', 'hello4@campfire.ca', '$2b$10$oMeyV3ebi66lTAL9hAhQJumGirYQkXBM4aDEc2o5ecQLzVflzgkNa', 5),
+('Edward', 'Ecksworth', 'hello5@campfire.ca', '$2b$10$oMeyV3ebi66lTAL9hAhQJumGirYQkXBM4aDEc2o5ecQLzVflzgkNa', 6),
+('Fiona', 'Ford', 'hello6@campfire.ca', '$2b$10$oMeyV3ebi66lTAL9hAhQJumGirYQkXBM4aDEc2o5ecQLzVflzgkNa', 7),
+('Gerald', 'George', 'hello7@campfire.ca', '$2b$10$oMeyV3ebi66lTAL9hAhQJumGirYQkXBM4aDEc2o5ecQLzVflzgkNa', 8),
+('Hannah', 'Herbert', 'hello8@campfire.ca', '$2b$10$oMeyV3ebi66lTAL9hAhQJumGirYQkXBM4aDEc2o5ecQLzVflzgkNa', 9);
 
 UPDATE users SET is_admin = TRUE WHERE id = 1;
 
