@@ -54,7 +54,10 @@ INSERT INTO post_tags (tag_id, post_id) VALUES
 INSERT INTO comments (post_id, parent_id, user_id, body) VALUES
 (1, null, 5, 'I had the same question!'),
 (1, null, 6, 'You can consume a promise by calling .then() on it! Be sure to use .catch() as well in case of errors.'),
-(3, null, 8, 'Ruby functions are declared using the def keyword, and finish with the end keyword.');
+(3, null, 8, 'Ruby functions are declared using the def keyword, and finish with the end keyword.'),
+(1, 2, 5, 'Thanks for this!!');
+
+UPDATE posts SET best_answer = 2 WHERE id = 1;
 
 INSERT INTO comment_likes (user_id, comment_id) VALUES
 (3, 2),
