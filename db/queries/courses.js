@@ -17,6 +17,52 @@ const getCoursesForUser = function (userId) {
     .then((res) => res.rows);
 };
 
+const getCourseByAccessCode = function (accessCode) {
+  return db
+    .query(
+      `
+    SELECT *
+    FROM courses
+    WHERE student_access_code = $1
+    OR instructor_access_code = $1;
+  `,
+      [accessCode]
+    )
+    .then((res) => res.rows[0]);
+};
+
+const enrolUserInCourse = function (userId, courseId, role) {
+  return db
+    .query(
+      `
+    INSERT INTO enrolments (user_id, course_id, role)
+    VALUES ($1, $2, $3)
+    RETURNING *;
+  `,
+      [userId, courseId, role]
+    )
+    .then((res) => res.rows[0]);
+};
+
+const createCourse = function (courseData) {
+  const {
+    name,
+    description,
+    studentAccessCode,
+    instructorAccessCode,
+  } = courseData;
+  return db
+    .query(
+      `
+    INSERT INTO courses (name, description, student_access_code, instructor_access_code)
+    VALUES ($1, $2, $3, $4)
+    RETURNING *;
+  `,
+      [name, description, studentAccessCode, instructorAccessCode]
+    )
+    .then((res) => res.rows[0]);
+};
+
 const getCourseById = function (id, userId) {
   const courseDataPromise = db.query(
     `
@@ -234,4 +280,10 @@ const getCourseById = function (id, userId) {
   });
 };
 
-module.exports = { getCoursesForUser, getCourseById };
+module.exports = {
+  getCoursesForUser,
+  getCourseById,
+  getCourseByAccessCode,
+  enrolUserInCourse,
+  createCourse,
+};

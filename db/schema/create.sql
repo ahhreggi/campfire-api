@@ -107,7 +107,8 @@ CREATE TABLE "enrolments" (
   "course_id" int,
   "role" roles,
   "banned" boolean DEFAULT false,
-  "enrolled" boolean DEFAULT true
+  "enrolled" boolean DEFAULT true,
+  UNIQUE ("user_id", "course_id")
 );
 
 ALTER TABLE "users" ADD FOREIGN KEY ("avatar_id") REFERENCES "avatars" ("id");
