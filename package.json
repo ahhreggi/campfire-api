@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "local": "./node_modules/.bin/nodemon"
   },
   "repository": {
@@ -25,5 +25,8 @@
     "jsonwebtoken": "^8.5.1",
     "nodemon": "^2.0.7",
     "pg": "^8.6.0"
+  },
+  "devDependencies": {
+    "jest": "^26.6.3"
   }
 }
