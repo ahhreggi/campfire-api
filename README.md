@@ -213,7 +213,7 @@ Response object:
         best_answer: number, // comment_id of the 'best_answer'
         author_first_name: string, // undefined if post is marked as anonymous and user is not privileged
         author_last_name: string, // undefined if post is marked as anonymous and user is not privileged
-        author_avatar_url: string, // undefined if post is marked as anonymous and user is not privileged
+        author_avatar_id: number, // '1' if post is marked as anonymous and user is not privileged
         pinned: boolean,
         views: int, // TODO: total number of times post has been viewed
         anonymous: boolean, // if poster has request anonymity
@@ -233,7 +233,7 @@ Response object:
             anonymous: boolean,
             author_first_name: string,
             author_last_name: string,
-            author_avatar_url: string,
+            author_avatar_id: number,
             body: string,
             score: number,
             created_at: timestamp,
@@ -249,6 +249,7 @@ Response object:
                 anonymous: boolean,
                 author_first_name: string,
                 author_last_name: string,
+                author_avatar_id: number,
                 body: string,
                 created_at: timestamp,
                 last_modified: timestamp,

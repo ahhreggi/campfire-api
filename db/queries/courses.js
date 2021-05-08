@@ -114,7 +114,7 @@ const getCourseById = function (id, userId) {
       best_answer,
       (SELECT first_name FROM users WHERE id = posts.user_id) AS author_first_name,
       (SELECT last_name FROM users WHERE id = posts.user_id) AS author_last_name,
-      (SELECT url FROM avatars WHERE avatars.id = (SELECT avatar_id FROM users WHERE users.id = $2)) AS author_avatar_url,
+      (SELECT avatar_id FROM users WHERE id = posts.user_id) AS author_avatar_id,
       pinned,
       views,
       anonymous,
@@ -137,7 +137,7 @@ const getCourseById = function (id, userId) {
       anonymous,
       (SELECT first_name FROM users WHERE users.id = user_id) AS author_first_name,
       (SELECT last_name FROM users WHERE users.id = user_id) AS author_last_name,
-      (SELECT url FROM avatars WHERE avatars.id = (SELECT avatar_id FROM users WHERE users.id = user_id)) AS author_avatar_url,
+      (SELECT avatar_id FROM users WHERE users.id = user_id) AS author_avatar_id,
       body,
       (SELECT COUNT(*) FROM comment_likes WHERE comment_id = comments.id) AS score,
       created_at,
@@ -163,6 +163,7 @@ const getCourseById = function (id, userId) {
       anonymous,
       (SELECT first_name FROM users WHERE users.id = user_id) AS author_first_name,
       (SELECT last_name FROM users WHERE users.id = user_id) AS author_last_name,
+      (SELECT avatar_id FROM users WHERE users.id = user_id) AS author_avatar_id,
       body,
       created_at,
       last_modified,
@@ -255,18 +256,19 @@ const getCourseById = function (id, userId) {
         if (post.anonymous) {
           delete post.author_first_name;
           delete post.author_last_name;
+          post.author_avatar_id = 1;
         }
         post.comments = post.comments.map((comment) => {
           if (comment.anonymous) {
             delete comment.author_first_name;
             delete comment.author_last_name;
-            delete comment.author_avatar_url;
+            comment.author_avatar_id = 1;
           }
           comment.replies = comment.replies.map((reply) => {
             if (reply.anonymous) {
               delete reply.author_first_name;
               delete reply.author_last_name;
-              delete reply.author_avatar_url;
+              reply.author_avatar_id = 1;
             }
             return reply;
           });
