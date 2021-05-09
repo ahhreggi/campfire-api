@@ -18,7 +18,7 @@ const postRoutes = require("./routes/postRoutes");
 const commentRoutes = require("./routes/commentRoutes");
 
 // Enable debug routes on non-prod environments
-if (process.env.ENV !== "production") {
+if (process.env.NODE_ENV !== "production") {
   app.use("/api/debug", debugRoutes);
 }
 
