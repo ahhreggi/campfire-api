@@ -66,6 +66,20 @@ const enrolUserInCourse = function (userId, courseId, role) {
     .then((res) => res.rows[0]);
 };
 
+const getCourseRole = function (courseId, userId) {
+  return db
+    .query(
+      `
+    SELECT 
+    CASE WHEN (SELECT is_admin FROM users WHERE id = $2) = TRUE THEN 'admin'
+    ELSE (SELECT role FROM enrolments WHERE user_id = $2 AND course_id = $1)
+    END AS role
+  `,
+      [courseId, userId]
+    )
+    .then((res) => res.rows[0].role);
+};
+
 const createCourse = function (courseData) {
   const {
     name,
@@ -309,6 +323,7 @@ const anonymize = function (obj) {
 module.exports = {
   getCoursesForUser,
   getCourseById,
+  getCourseRole,
   getCourseByAccessCode,
   enrolUserInCourse,
   createCourse,

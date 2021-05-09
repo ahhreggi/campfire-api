@@ -238,10 +238,11 @@ Response object:
             score: number,
             created_at: timestamp,
             last_modified: timestamp,
-            endorsed: boolean,
+            endorsed: boolean, // TODO: switch to 'endorsements' and value is array containing id, full name (in 1 var) of endorsers
             role: string,
             user_id: number,
             editable: boolean,
+            // TODO: add 'endorseable' if current user can endorse
             replies: [
               {
                 id: number,
@@ -251,11 +252,13 @@ Response object:
                 author_last_name: string,
                 author_avatar_id: number,
                 body: string,
+                // TODO: add score
                 created_at: timestamp,
                 last_modified: timestamp,
                 role: string,
                 user_id: number,
                 editable: boolean,
+                // TODO: add 'endorseable' if current user can endorse
               }
             ]
           }
@@ -305,7 +308,30 @@ Request object:
 
 Add a new post.
 
-_TODO_
+Request object:
+
+```js
+  {
+    token: string, // JWT
+    courseId: number, // course id to post in
+    title: string,
+    body: string,
+    anonymous: boolean, // optional: default false
+  }
+```
+
+Requirements:
+
+1. user has permission to post in this course
+
+Return object:
+
+```
+*TBD*
+```
+
+- the newly created post object?
+- entire course object with posts updated?
 
 ---
 
@@ -313,7 +339,41 @@ _TODO_
 
 Edit a post.
 
-_TODO_
+Request object:
+
+```js
+  {
+    token: string, // JWT
+    title: string, // optional - will update last_modified
+    body: string, // optional - will update last_modified
+    best_answer: number, // optional
+    anonymous: boolean, // optional
+    pinned: boolean, // optional
+  }
+```
+
+Requirements:
+
+1. user has edit access on the post
+
+Response object is the updated post:
+
+```js
+  {
+    id: number,
+    user_id: number,
+    course_id: number,
+    title: string,
+    body: string,
+    created_at: timestamp,
+    last_modified: timestamp,
+    best_answer: number, // nullable
+    anonymous: boolean,
+    active: boolean,
+    pinned: boolean,
+    views: boolean,
+  }
+```
 
 ---
 
@@ -321,7 +381,13 @@ _TODO_
 
 Delete a post.
 
-_TODO_
+Request object:
+
+```js
+  {
+    token: string, // JWT
+  }
+```
 
 ---
 
@@ -331,7 +397,36 @@ _TODO_
 
 Add a comment to a post.
 
-_TODO_
+Request object:
+
+```js
+  {
+    postId: number,
+    body: string,
+    parentId: number, // optional, if reply
+    anonymous: boolean, // optional
+  }
+```
+
+Requirements:
+
+1. user has right to post comments on the post
+
+Response object is new comment object:
+
+```js
+  {
+    id: number,
+    post_id: number,
+    parent_id: number, // nullable
+    user_id: number,
+    body: string,
+    created_at: timestamp,
+    last_modified: timestamp,
+    anonymous: boolean,
+    active: boolean,
+  }
+```
 
 ---
 
