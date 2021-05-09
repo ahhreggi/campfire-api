@@ -201,6 +201,7 @@ const getCourseById = function (id, userId) {
       (SELECT last_name FROM users WHERE users.id = user_id) AS author_last_name,
       (SELECT avatar_id FROM users WHERE users.id = user_id) AS author_avatar_id,
       body,
+      (SELECT COUNT(*) FROM comment_likes WHERE comment_id = comments.id) AS score,
       created_at,
       last_modified,
       CASE 
