@@ -79,8 +79,6 @@ router.patch("/posts/:id", isAuthenticated, (req, res) => {
         queries.push(setPinned(postId, pinned));
       }
 
-      console.log(queries.length);
-
       return Promise.all(queries);
     })
     // Send back the updated post

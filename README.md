@@ -430,15 +430,43 @@ Response object is new comment object:
 
 ---
 
-### `PATCH /comments/:id`
+### `PATCH /api/comments/:id`
 
 Edit a comment of a post.
 
-_TODO_
+Request body:
+
+```js
+  {
+    token: string, // JWT
+    body: string, // optional
+    anonymous: boolean, // optional
+  }
+```
+
+Requirements:
+
+1. user has rights to edit this comment
+
+Return object is updated comment object:
+
+```js
+  {
+    id: number,
+    post_id: number,
+    parent_id: number, // nullable
+    user_id: number,
+    body: string,
+    created_at: timestamp,
+    last_modified: timestamp,
+    anonymous: boolean,
+    active: boolean,
+  }
+```
 
 ---
 
-### `DELETE /comments/:id`
+### `DELETE /api/comments/:id`
 
 Delete a comment.
 
