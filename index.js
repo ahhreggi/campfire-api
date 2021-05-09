@@ -15,12 +15,18 @@ const userRoutes = require("./routes/userRoutes");
 const courseRoutes = require("./routes/courseRoutes");
 const bookmarkRoutes = require("./routes/bookmarkRoutes");
 const postRoutes = require("./routes/postRoutes");
+const commentRoutes = require("./routes/commentRoutes");
 
-app.use("/api/debug", debugRoutes);
+// Enable debug routes on non-prod environments
+if (process.env.ENV !== "production") {
+  app.use("/api/debug", debugRoutes);
+}
+
 app.use("/api", userRoutes);
 app.use("/api", courseRoutes);
 app.use("/api", bookmarkRoutes);
 app.use("/api", postRoutes);
+app.use("/api", commentRoutes);
 
 app.listen(PORT, () => {
   console.log(`Campfire API running on PORT ${PORT}!`);
