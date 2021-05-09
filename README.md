@@ -324,14 +324,22 @@ Requirements:
 
 1. user has permission to post in this course
 
-Return object:
+Return object is the newly created post object:
 
+```js
+{
+  id: number,
+  user_id: number,
+  course_id: number,
+  title: string,
+  body: string,
+  created_at: timestamp,
+  last_modified: timestamp,
+  best_answer: number, // nullable
+  anonymous: boolean,
+  active: boolean,
+}
 ```
-*TBD*
-```
-
-- the newly created post object?
-- entire course object with posts updated?
 
 ---
 

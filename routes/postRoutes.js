@@ -35,7 +35,7 @@ router.post("/posts", isAuthenticated, (req, res) => {
         .send({ message: "User doesn't have access to this course" });
     }
     // User does have permission - create post
-    createPost({ id, courseId, title, body, anonymous })
+    createPost({ userId: id, courseId, title, body, anonymous })
       .then((result) => res.send(result))
       .catch((e) => res.status(500).send(e));
   });
