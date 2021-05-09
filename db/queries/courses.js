@@ -246,20 +246,6 @@ const getCourseById = function (id, userId) {
     WHERE role IN ('instructor', 'owner', 'admin');
   `);
 
-  // get course comment likes
-  // in endorsements: filter via comment id
-
-  /*
-    {
-      id,
-      comment_id,
-      endorser_id,
-      endorser_name
-    }
-
-
-  */
-
   return Promise.all([
     courseDataPromise,
     courseRolePromise,
@@ -314,8 +300,7 @@ const getCourseById = function (id, userId) {
           .map((comment) => ({
             ...comment,
             editable: editable(role, comment.role, userId, comment.user_id),
-            endorsable:
-              role === "admin" || role === "owner" || role === "instructor",
+            endorsable: endorsable(role),
             endorsements: commentEndorsements.rows.filter(
               (endorsement) => endorsement.comment_id === comment.id
             ),
@@ -324,8 +309,7 @@ const getCourseById = function (id, userId) {
               .map((reply) => ({
                 ...reply,
                 editable: editable(role, reply.role, userId, reply.user_id),
-                endorsable:
-                  role === "admin" || role === "owner" || role === "instructor",
+                endorsable: endorsable(role),
                 endorsements: commentEndorsements.rows.filter(
                   (endorsement) => endorsement.comment_id === reply.id
                 ),
@@ -367,6 +351,10 @@ const anonymize = function (obj) {
   delete obj.author_last_name;
   obj.author_avatar_id = 1;
   return obj;
+};
+
+const endorsable = function (role) {
+  return role === "admin" || role === "owner" || role === "instructor";
 };
 
 module.exports = {
