@@ -276,11 +276,15 @@ const getCourseById = function (id, userId) {
           .map((comment) => ({
             ...comment,
             editable: editable(role, comment.role, userId, comment.user_id),
+            endorsable:
+              role === "admin" || role === "owner" || role === "instructor",
             replies: courseCommentReplies.rows
               .filter((reply) => reply.parent_id === comment.id)
               .map((reply) => ({
                 ...reply,
                 editable: editable(role, reply.role, userId, reply.user_id),
+                endorsable:
+                  role === "admin" || role === "owner" || role === "instructor",
               })),
           })),
       })),

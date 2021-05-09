@@ -242,7 +242,7 @@ Response object:
             role: string,
             user_id: number,
             editable: boolean,
-            // TODO: add 'endorseable' if current user can endorse
+            endorsable: boolean,
             replies: [
               {
                 id: number,
@@ -258,7 +258,7 @@ Response object:
                 role: string,
                 user_id: number,
                 editable: boolean,
-                // TODO: add 'endorseable' if current user can endorse
+                endorsable: boolean,
               }
             ]
           }
