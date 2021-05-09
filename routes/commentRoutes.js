@@ -9,6 +9,7 @@ const {
   setBody,
   setAnonymity,
   getCommentById,
+  deleteComment,
 } = require("../db/queries/comments");
 
 const { editable } = require("../helpers/permissionsHelpers");
@@ -59,6 +60,25 @@ router.patch("/comments/:id", isAuthenticated, (req, res) => {
     })
     .then(() => getCommentById(commentId))
     .then((comment) => res.send(comment))
+    .catch((e) => res.status(400).send({ message: e }));
+});
+
+router.delete("/comments/:id", isAuthenticated, (req, res) => {
+  const { id } = res.locals.decodedToken;
+  const commentId = req.params.id;
+
+  // Check if user has edit permissions on the comment
+  const rolePromise = getCourseRoleFromCommentId(commentId, id);
+  const commentorRolePromise = getCommentorsCourseRole(commentId);
+  const commentorIdPromise = getCommentorId(commentId);
+  Promise.all([rolePromise, commentorRolePromise, commentorIdPromise])
+    .then((result) => {
+      const [role, commentorRole, commentorId] = result;
+      if (!editable(role, commentorRole, id, commentorId)) {
+        return Promise.reject("User doesn't have rights to edit this comment");
+      }
+      deleteComment(commentId).then(() => res.send());
+    })
     .catch((e) => res.status(400).send({ message: e }));
 });
 

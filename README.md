@@ -470,4 +470,14 @@ Return object is updated comment object:
 
 Delete a comment.
 
-_TODO_
+Request object:
+
+```js
+  {
+    token: string, // JWT
+  }
+```
+
+Requirements:
+
+1. user has rights to edit this comment

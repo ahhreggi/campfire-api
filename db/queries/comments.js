@@ -136,6 +136,20 @@ const getCommentById = function (commentId) {
     .then((res) => res.rows[0]);
 };
 
+const deleteComment = function (commentId) {
+  return db
+    .query(
+      `
+      UPDATE comments
+      SET active = false
+      WHERE id = $1
+      RETURNING *;
+    `,
+      [commentId]
+    )
+    .then((res) => res.rows[0]);
+};
+
 module.exports = {
   createComment,
   getCourseRoleFromCommentId,
@@ -144,4 +158,5 @@ module.exports = {
   setBody,
   setAnonymity,
   getCommentById,
+  deleteComment,
 };
