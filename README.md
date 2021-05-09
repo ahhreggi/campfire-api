@@ -252,7 +252,7 @@ Response object:
                 author_last_name: string,
                 author_avatar_id: number,
                 body: string,
-                // TODO: add score
+                score: number,
                 created_at: timestamp,
                 last_modified: timestamp,
                 role: string,
