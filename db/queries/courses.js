@@ -224,6 +224,42 @@ const getCourseById = function (id, userId) {
     [id]
   );
 
+  const commentEndorsementsPromise = db.query(`
+  WITH cte2 AS (
+    WITH cte AS (
+      SELECT 
+        comment_likes.id as id, 
+        user_id, 
+        concat(first_name, ' ', last_name) AS endorser_name, 
+        comment_id
+      FROM comment_likes
+      JOIN users ON user_id = users.id
+    )
+    SELECT cte.id, cte.user_id, cte.endorser_name, cte.comment_id, role 
+    FROM cte
+    JOIN comments ON comment_id = comments.id
+    JOIN posts ON post_id = posts.id
+    INNER JOIN enrolments 
+      ON enrolments.course_id = posts.course_id
+      AND enrolments.user_id = cte.user_id)
+    SELECT id, user_id, endorser_name, comment_id FROM cte2
+    WHERE role IN ('instructor', 'owner', 'admin');
+  `);
+
+  // get course comment likes
+  // in endorsements: filter via comment id
+
+  /*
+    {
+      id,
+      comment_id,
+      endorser_id,
+      endorser_name
+    }
+
+
+  */
+
   return Promise.all([
     courseDataPromise,
     courseRolePromise,
@@ -232,6 +268,7 @@ const getCourseById = function (id, userId) {
     courseCommentsPromise,
     courseCommentRepliesPromise,
     coursePostTagsPromise,
+    commentEndorsementsPromise,
   ]).then((results) => {
     const [
       courseData,
@@ -241,6 +278,7 @@ const getCourseById = function (id, userId) {
       courseComments,
       courseCommentReplies,
       coursePostTags,
+      commentEndorsements,
     ] = results;
 
     const { role } = courseRole.rows[0];
@@ -278,6 +316,9 @@ const getCourseById = function (id, userId) {
             editable: editable(role, comment.role, userId, comment.user_id),
             endorsable:
               role === "admin" || role === "owner" || role === "instructor",
+            endorsements: commentEndorsements.rows.filter(
+              (endorsement) => endorsement.comment_id === comment.id
+            ),
             replies: courseCommentReplies.rows
               .filter((reply) => reply.parent_id === comment.id)
               .map((reply) => ({
@@ -285,6 +326,9 @@ const getCourseById = function (id, userId) {
                 editable: editable(role, reply.role, userId, reply.user_id),
                 endorsable:
                   role === "admin" || role === "owner" || role === "instructor",
+                endorsements: commentEndorsements.rows.filter(
+                  (endorsement) => endorsement.comment_id === reply.id
+                ),
               })),
           })),
       })),

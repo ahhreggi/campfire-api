@@ -238,7 +238,12 @@ Response object:
             score: number,
             created_at: timestamp,
             last_modified: timestamp,
-            endorsed: boolean, // TODO: switch to 'endorsements' and value is array containing id, full name (in 1 var) of endorsers
+            endorsements: {
+              id: number,
+              user_id: number,
+              endorser_name: string,
+              comment_id: number
+            }
             role: string,
             user_id: number,
             editable: boolean,
@@ -255,6 +260,12 @@ Response object:
                 score: number,
                 created_at: timestamp,
                 last_modified: timestamp,
+                endorsements: {
+                  id: number,
+                  user_id: number,
+                  endorser_name: string,
+                  comment_id: number
+                },
                 role: string,
                 user_id: number,
                 editable: boolean,
