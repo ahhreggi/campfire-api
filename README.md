@@ -238,12 +238,14 @@ Response object:
             score: number,
             created_at: timestamp,
             last_modified: timestamp,
-            endorsements: {
-              id: number,
-              user_id: number,
-              endorser_name: string,
-              comment_id: number
-            }
+            endorsements: [
+              {
+                id: number,
+                user_id: number,
+                endorser_name: string,
+                comment_id: number
+              }
+            ],
             role: string,
             user_id: number,
             editable: boolean,
@@ -260,12 +262,14 @@ Response object:
                 score: number,
                 created_at: timestamp,
                 last_modified: timestamp,
-                endorsements: {
-                  id: number,
-                  user_id: number,
-                  endorser_name: string,
-                  comment_id: number
-                },
+                endorsements: [
+                  {
+                    id: number,
+                    user_id: number,
+                    endorser_name: string,
+                    comment_id: number
+                  }
+                ],
                 role: string,
                 user_id: number,
                 editable: boolean,
