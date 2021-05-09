@@ -409,6 +409,7 @@ Request object:
 
 ```js
   {
+    token: string, // JWT
     postId: number,
     body: string,
     parentId: number, // optional, if reply
