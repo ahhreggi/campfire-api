@@ -1,13 +1,9 @@
-// load .env into process.env
-
 ENV = process.env.NODE_ENV
-
+// If ENV exists, load .env.ENV into process.env, else load .env
 require('dotenv').config( ENV ? { path: `.env.${ENV}` } : '' )
 
 // Imports
 const express = require("express");
-
-// console.log(`DEBUG: CURRENTLY ON ENV FILE: ${}`)
 
 // Web server config
 const PORT = process.env.PORT || 3000;
