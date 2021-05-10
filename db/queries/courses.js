@@ -289,6 +289,7 @@ const getCourseById = function (id, userId) {
       posts: coursePosts.rows.map((post) => ({
         ...post,
         editable: editable(role, post.role, userId, post.user_id),
+        pinnable: pinnable(role),
         tags: coursePostTags.rows
           .filter((postTag) => postTag.post_id === post.id)
           .map((tag) => {
@@ -356,6 +357,7 @@ const anonymize = function (obj) {
 const endorsable = function (role) {
   return role === "admin" || role === "owner" || role === "instructor";
 };
+const pinnable = endorsable;
 
 module.exports = {
   getCoursesForUser,

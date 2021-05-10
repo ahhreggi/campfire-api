@@ -223,7 +223,8 @@ Response object:
         anonymous: boolean, // if poster has request anonymity
         role: string, // role of the poster (student/instructor/owner/admin)
         user_id: number,
-        editable: boolean, // whether current user has edit permission on this post
+        editable: boolean, // user permission to edit this post
+        pinnable: boolean, // user has permission to pin this post
         tags: [
           {
             id: number,
