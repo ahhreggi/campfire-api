@@ -1,5 +1,9 @@
 Development server: `139.177.195.214`
 
+Run dev server locally: `npm start`
+
+Run test server locally: `npm run test:server`
+
 ---
 
 # Routes

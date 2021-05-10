@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node index",
     "test": "jest",
-    "local": "./node_modules/.bin/nodemon"
+    "local": "./node_modules/.bin/nodemon",
+    "test:server": "NODE_ENV=test npm start"
   },
   "repository": {
     "type": "git",
