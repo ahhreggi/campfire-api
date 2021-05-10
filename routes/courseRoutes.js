@@ -83,13 +83,12 @@ router.get("/courses/:id", isAuthenticated, (req, res) => {
     .then((hasAccess) => {
       if (hasAccess) return getCourseById(courseId, id);
       else
-        return res
-          .status(401)
-          .send({
-            message: "User doesn't have permission to access this course",
-          });
+        return Promise.reject(
+          "User doesn't have permission to access this course"
+        );
     })
-    .then((courseData) => res.send(courseData));
+    .then((courseData) => res.send(courseData))
+    .catch((e) => res.status(401).send({ message: e }));
 });
 
 module.exports = router;
