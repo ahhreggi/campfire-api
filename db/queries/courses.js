@@ -224,6 +224,15 @@ const getCourseById = function (id, userId) {
     [id]
   );
 
+  const commentLikesPromise = db.query(
+    `
+    SELECT *
+    FROM comment_likes
+    WHERE user_id = $1;
+  `,
+    [userId]
+  );
+
   const commentEndorsementsPromise = db.query(`
   WITH cte2 AS (
     WITH cte AS (
@@ -254,6 +263,7 @@ const getCourseById = function (id, userId) {
     courseCommentsPromise,
     courseCommentRepliesPromise,
     coursePostTagsPromise,
+    commentLikesPromise,
     commentEndorsementsPromise,
   ]).then((results) => {
     const [
@@ -264,6 +274,7 @@ const getCourseById = function (id, userId) {
       courseComments,
       courseCommentReplies,
       coursePostTags,
+      commentLikes,
       commentEndorsements,
     ] = results;
 
@@ -303,6 +314,9 @@ const getCourseById = function (id, userId) {
             score: parseInt(comment.score),
             editable: editable(role, comment.role, userId, comment.user_id),
             endorsable: endorsable(role),
+            liked:
+              commentLikes.rows.filter((like) => like.comment_id === comment.id)
+                .length > 0,
             endorsements: commentEndorsements.rows.filter(
               (endorsement) => endorsement.comment_id === comment.id
             ),
@@ -313,6 +327,10 @@ const getCourseById = function (id, userId) {
                 score: parseInt(reply.score),
                 editable: editable(role, reply.role, userId, reply.user_id),
                 endorsable: endorsable(role),
+                liked:
+                  commentLikes.rows.filter(
+                    (like) => like.comment_id === reply.id
+                  ).length > 0,
                 endorsements: commentEndorsements.rows.filter(
                   (endorsement) => endorsement.comment_id === reply.id
                 ),

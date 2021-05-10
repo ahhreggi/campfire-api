@@ -260,7 +260,7 @@ Response object:
           {
             id: number,
             post_id: number,
-            // TODO: liked: boolean,
+            liked: boolean,
             anonymous: boolean,
             author_first_name: string,
             author_last_name: string,
@@ -285,7 +285,7 @@ Response object:
               {
                 id: number,
                 parent_id: number,
-                // TODO: liked: boolean,
+                liked: boolean,
                 anonymous: boolean,
                 author_first_name: string,
                 author_last_name: string,
