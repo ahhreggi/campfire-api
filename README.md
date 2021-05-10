@@ -1,8 +1,33 @@
+# Info & Setup
+
 Development server: `139.177.195.214`
 
 Run dev server locally: `npm start`
 
 Run test server locally: `npm run test:server`
+
+---
+
+# Seed Data
+
+All logins are formatted as `hello{id}@campfire.ca` with password: `password`
+
+### Key users:
+
+1. Admin
+2. Owner of 'JS for Beginners' course
+3. Owner of 'Raucous Ruby' course
+4. Owner of 'Everything HTML' course
+5. Instructor for 'JS for Beginners' course
+6. Instructor for 'Raucous Ruby' course
+7. Instructor for 'Everything HTML' course
+8. Instructor for 'Everything HTML' course
+
+9-12: Students in 'JS for Beginners'
+
+13-16: Students in 'Raucous Ruby'
+
+17-20: Students in 'Everything HTML'
 
 ---
 
@@ -235,6 +260,7 @@ Response object:
           {
             id: number,
             post_id: number,
+            // TODO: liked: boolean,
             anonymous: boolean,
             author_first_name: string,
             author_last_name: string,
@@ -259,6 +285,7 @@ Response object:
               {
                 id: number,
                 parent_id: number,
+                // TODO: liked: boolean,
                 anonymous: boolean,
                 author_first_name: string,
                 author_last_name: string,
