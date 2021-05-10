@@ -300,6 +300,7 @@ const getCourseById = function (id, userId) {
           .filter((comment) => comment.post_id === post.id)
           .map((comment) => ({
             ...comment,
+            score: parseInt(comment.score),
             editable: editable(role, comment.role, userId, comment.user_id),
             endorsable: endorsable(role),
             endorsements: commentEndorsements.rows.filter(
@@ -309,6 +310,7 @@ const getCourseById = function (id, userId) {
               .filter((reply) => reply.parent_id === comment.id)
               .map((reply) => ({
                 ...reply,
+                score: parseInt(reply.score),
                 editable: editable(role, reply.role, userId, reply.user_id),
                 endorsable: endorsable(role),
                 endorsements: commentEndorsements.rows.filter(
