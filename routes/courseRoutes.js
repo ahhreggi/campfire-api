@@ -82,6 +82,12 @@ router.get("/courses/:id", isAuthenticated, (req, res) => {
     .then((courseIds) => courseIds.includes(courseId))
     .then((hasAccess) => {
       if (hasAccess) return getCourseById(courseId, id);
+      else
+        return res
+          .status(401)
+          .send({
+            message: "User doesn't have permission to access this course",
+          });
     })
     .then((courseData) => res.send(courseData));
 });
