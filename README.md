@@ -537,3 +537,40 @@ Request object:
 Requirements:
 
 1. user has rights to edit this comment
+
+---
+
+### `POST /api/comments/:id/like` // TODO
+
+Like a comment.
+
+Request object:
+
+```js
+  {
+    token: string, // JWT
+  }
+```
+
+Requirements:
+
+1. user has access to the course the comment is posted in
+
+---
+
+### `POST /api/comments/:id/unlike` // TODO
+
+Remove a like from a comment.
+
+Request object:
+
+```js
+  {
+    token: string, // JWT
+  }
+```
+
+Requirements:
+
+1. user has access to the course the comment is posted in
+2. user had previously liked the comment
