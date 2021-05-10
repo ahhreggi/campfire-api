@@ -62,7 +62,8 @@ CREATE TABLE "comments" (
 CREATE TABLE "comment_likes" (
   "id" SERIAL PRIMARY KEY,
   "user_id" int,
-  "comment_id" int
+  "comment_id" int,
+  UNIQUE ("user_id", "comment_id")
 );
 
 CREATE TABLE "tags" (

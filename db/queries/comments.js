@@ -150,6 +150,33 @@ const deleteComment = function (commentId) {
     .then((res) => res.rows[0]);
 };
 
+const likeComment = function (commentId, userId) {
+  return db
+    .query(
+      `
+    INSERT INTO comment_likes (user_id, comment_id)
+    VALUES ($1, $2)
+    RETURNING *;
+  `,
+      [userId, commentId]
+    )
+    .then((res) => res.rows[0]);
+};
+
+const unlikeComment = function (commentId, userId) {
+  return db
+    .query(
+      `
+    DELETE FROM comment_likes
+    WHERE user_id = $1
+    AND comment_id = $2
+    RETURNING *;
+    `,
+      [userId, commentId]
+    )
+    .then((res) => res.rows[0]);
+};
+
 module.exports = {
   createComment,
   getCourseRoleFromCommentId,
@@ -159,4 +186,6 @@ module.exports = {
   setAnonymity,
   getCommentById,
   deleteComment,
+  likeComment,
+  unlikeComment,
 };

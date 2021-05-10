@@ -540,7 +540,7 @@ Requirements:
 
 ---
 
-### `POST /api/comments/:id/like` // TODO
+### `POST /api/comments/:id/like`
 
 Like a comment.
 
@@ -558,7 +558,7 @@ Requirements:
 
 ---
 
-### `POST /api/comments/:id/unlike` // TODO
+### `POST /api/comments/:id/unlike`
 
 Remove a like from a comment.
 
@@ -569,8 +569,3 @@ Request object:
     token: string, // JWT
   }
 ```
-
-Requirements:
-
-1. user has access to the course the comment is posted in
-2. user had previously liked the comment

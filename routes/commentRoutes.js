@@ -10,6 +10,8 @@ const {
   setAnonymity,
   getCommentById,
   deleteComment,
+  likeComment,
+  unlikeComment,
 } = require("../db/queries/comments");
 
 const { editable } = require("../helpers/permissionsHelpers");
@@ -80,6 +82,32 @@ router.delete("/comments/:id", isAuthenticated, (req, res) => {
       deleteComment(commentId).then(() => res.send());
     })
     .catch((e) => res.status(400).send({ message: e }));
+});
+
+router.post("/comments/:id/like", isAuthenticated, (req, res) => {
+  const { id } = res.locals.decodedToken;
+  const commentId = req.params.id;
+
+  // Check user has access to course comment is posted in
+  getCourseRoleFromCommentId(commentId, id)
+    .then((role) => {
+      if (role) return likeComment(commentId, id);
+      else
+        return Promise.reject(
+          "User doesn't have access to the course this comment is posted in"
+        );
+    })
+    .then((result) => res.send())
+    .catch((e) => res.status(500).send({ message: e }));
+});
+
+router.post("/comments/:id/unlike", isAuthenticated, (req, res) => {
+  const { id } = res.locals.decodedToken;
+  const commentId = req.params.id;
+
+  unlikeComment(commentId, id)
+    .then((result) => res.send())
+    .catch((e) => res.status(500).send({ message: e }));
 });
 
 module.exports = router;
