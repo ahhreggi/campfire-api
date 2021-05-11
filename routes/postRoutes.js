@@ -15,32 +15,31 @@ const {
 const { editable } = require("../helpers/permissionsHelpers");
 const router = require("express").Router();
 
-router.post("/posts", (req, res) => {
+router.post("/posts", (req, res, next) => {
   const { id } = res.locals.decodedToken;
   const { courseID, title, body, anonymous } = req.body;
 
   // Check fields
   if (!courseID || !title || !body) {
-    return res
-      .status(400)
-      .send({ message: "courseID, title, body are required" });
+    return next({ status: 400, message: "courseID, title, body are required" });
   }
 
   getCoursesForUser(id).then((courses) => {
     // Check user has permission to create post in the course
     if (courses.filter((course) => course.id === courseID).length < 1) {
-      return res
-        .status(401)
-        .send({ message: "User doesn't have access to this course" });
+      return next({
+        status: 401,
+        message: "User doesn't have access to this course",
+      });
     }
     // User does have permission - create post
     createPost({ userId: id, courseID, title, body, anonymous })
       .then((result) => res.send(result))
-      .catch((e) => res.status(500).send(e));
+      .catch((e) => next(e));
   });
 });
 
-router.patch("/posts/:id", (req, res) => {
+router.patch("/posts/:id", (req, res, next) => {
   const { id } = res.locals.decodedToken;
   const postId = req.params.id;
   const { title, body, best_answer, anonymous, pinned } = req.body;
@@ -53,7 +52,10 @@ router.patch("/posts/:id", (req, res) => {
     .then((result) => {
       const [role, posterRole, posterId] = result;
       if (!editable(role, posterRole, id, posterId)) {
-        return Promise.reject("User doesn't have rights to edit this post");
+        return Promise.reject({
+          status: 401,
+          message: "User doesn't have rights to edit this post",
+        });
       }
 
       const queries = [];
@@ -83,29 +85,31 @@ router.patch("/posts/:id", (req, res) => {
     // Send back the updated post
     .then(() => getPostById(postId))
     .then((result) => res.send(result))
-    .catch((e) => res.status(400).send({ message: e }));
+    .catch((err) => next(err));
 });
 
-router.delete("/posts/:id", (req, res) => {
+router.delete("/posts/:id", (req, res, next) => {
   const { id } = res.locals.decodedToken;
   const postId = req.params.id;
   // Check if user has edit permissions on the post
   const rolePromise = getCourseRoleFromPostId(postId, id);
   const posterRolePromise = getPostersCourseRole(postId);
   const posterIdPromise = getPosterId(postId);
-  Promise.all([rolePromise, posterRolePromise, posterIdPromise]).then(
-    (result) => {
+  Promise.all([rolePromise, posterRolePromise, posterIdPromise])
+    .then((result) => {
       const [role, posterRole, posterId] = result;
       if (!editable(role, posterRole, id, posterId)) {
-        return Promise.reject("User doesn't have rights to edit this post");
+        return Promise.reject({
+          status: 401,
+          message: "User doesn't have rights to edit this post",
+        });
       }
 
       // Delete the post
-      deletePost(postId)
-        .then(() => res.send())
-        .catch((e) => res.status(500).send({ message: e }));
-    }
-  );
+      return deletePost(postId);
+    })
+    .then(() => res.send())
+    .catch((err) => next(err));
 });
 
 module.exports = router;
