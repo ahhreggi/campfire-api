@@ -13,6 +13,7 @@ const {
   likeComment,
   unlikeComment,
   getCommentsForPost,
+  commentIsReply,
 } = require("../db/queries/comments");
 
 const { editable } = require("../helpers/permissionsHelpers");
@@ -36,16 +37,30 @@ router.post("/comments", (req, res, next) => {
 
       if (parentID) {
         // Check parent comment was made on the same post
-        return getCommentsForPost(postID).then((comments) => {
-          if (
-            comments.filter((comment) => comment.id === parentID).length < 1
-          ) {
-            return Promise.reject({
-              status: 400,
-              message: "The provided parentID is not a comment on this post.",
-            });
-          }
-        });
+        return (
+          getCommentsForPost(postID)
+            .then((comments) => {
+              if (
+                comments.filter((comment) => comment.id === parentID).length < 1
+              ) {
+                return Promise.reject({
+                  status: 400,
+                  message:
+                    "The provided parentID is not a comment on the provided postID",
+                });
+              }
+            })
+            // Check parent comment is not a reply itself (ie. only allow 1 level of nesting)
+            .then(() => commentIsReply(parentID))
+            .then((isReply) => {
+              if (isReply)
+                return Promise.reject({
+                  status: 400,
+                  message:
+                    "The provided parentID is not a top-level comment (you cannot reply to a reply)",
+                });
+            })
+        );
       }
     })
     .then(() =>
@@ -55,7 +70,7 @@ router.post("/comments", (req, res, next) => {
     .catch((err) => next(err));
 });
 
-router.patch("/comments/:id", (req, res) => {
+router.patch("/comments/:id", (req, res, next) => {
   const { id } = res.locals.decodedToken;
   const { body, anonymous } = req.body;
   const commentId = req.params.id;
@@ -68,7 +83,10 @@ router.patch("/comments/:id", (req, res) => {
     .then((result) => {
       const [role, commentorRole, commentorId] = result;
       if (!editable(role, commentorRole, id, commentorId)) {
-        return Promise.reject("User doesn't have rights to edit this comment");
+        return Promise.reject({
+          status: 401,
+          message: "User doesn't have rights to edit this comment",
+        });
       }
 
       const queries = [];
@@ -85,10 +103,10 @@ router.patch("/comments/:id", (req, res) => {
     })
     .then(() => getCommentById(commentId))
     .then((comment) => res.send(comment))
-    .catch((e) => res.status(400).send({ message: e }));
+    .catch((e) => next(e));
 });
 
-router.delete("/comments/:id", (req, res) => {
+router.delete("/comments/:id", (req, res, next) => {
   const { id } = res.locals.decodedToken;
   const commentId = req.params.id;
 
@@ -100,11 +118,15 @@ router.delete("/comments/:id", (req, res) => {
     .then((result) => {
       const [role, commentorRole, commentorId] = result;
       if (!editable(role, commentorRole, id, commentorId)) {
-        return Promise.reject("User doesn't have rights to edit this comment");
+        return Promise.reject({
+          status: 401,
+          message: "User doesn't have rights to edit this comment",
+        });
       }
-      deleteComment(commentId).then(() => res.send());
+      return deleteComment(commentId);
     })
-    .catch((e) => res.status(400).send({ message: e }));
+    .then(() => res.send())
+    .catch((e) => next(e));
 });
 
 router.post("/comments/:id/like", (req, res) => {

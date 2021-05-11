@@ -2,8 +2,8 @@ const db = require("../index");
 
 const createComment = function (commentData) {
   const {
-    postId,
-    parentId = null,
+    postID,
+    parentID = null,
     userId,
     body,
     anonymous = false,
@@ -15,9 +15,22 @@ const createComment = function (commentData) {
     VALUES ($1, $2, $3, $4, $5)
     RETURNING *;
   `,
-      [postId, parentId, userId, body, anonymous]
+      [postID, parentID, userId, body, anonymous]
     )
     .then((res) => res.rows[0]);
+};
+
+const commentIsReply = function (commentId) {
+  return db
+    .query(
+      `
+    SELECT parent_id
+    FROM comments
+    WHERE id = $1;
+  `,
+      [commentId]
+    )
+    .then((res) => Boolean(res.rows[0].parent_id));
 };
 
 const getCourseRoleFromCommentId = function (commentId, userId) {
@@ -194,6 +207,7 @@ module.exports = {
   getCourseRoleFromCommentId,
   getCommentorsCourseRole,
   getCommentorId,
+  commentIsReply,
   setBody,
   setAnonymity,
   getCommentById,
