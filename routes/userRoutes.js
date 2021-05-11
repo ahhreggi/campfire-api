@@ -5,14 +5,14 @@ const jwt = require("jsonwebtoken");
 const { createUser, getUserByEmail } = require("../db/queries/users");
 
 // Register a new user
-router.post("/register", (req, res) => {
-  // TODO: check user is not logged in
-  // const decoded = jwt.verify(req.body.token, process.env.JWT_SECRET_KEY)
-
+router.post("/register", (req, res, next) => {
   // Check form is valid
   let { firstName, lastName, email, password } = req.body;
   if (!firstName || !lastName || !email || !password) {
-    res.status(400).send();
+    return next({
+      status: 400,
+      message: "firstName, lastName, email, and password are required",
+    });
   }
 
   // Hash password
@@ -35,28 +35,29 @@ router.post("/register", (req, res) => {
         );
         res.status(200).send({ token, email, firstName, lastName, avatarID });
       } else {
-        res.status(400).send();
+        next({
+          status: 500,
+          message: "Unknown error occured - failed to create user",
+        });
       }
     })
-    .catch((err) => res.status(500).send(err));
+    .catch((err) => next(err));
 });
 
 // Log a user in
 // If successful, returns a token and user's email
-router.post("/login", (req, res) => {
+router.post("/login", (req, res, next) => {
   // Check we have email and password
   const { email, password } = req.body;
   if (!email || !password) {
-    res.status(400).send();
+    return next({ status: 400, message: "email, password are required" });
   }
 
   // Find user
   getUserByEmail(email)
     .then((user) => {
       if (!user) {
-        return res
-          .status(400)
-          .send({ message: "No user exists with this email" });
+        return next({ status: 400, message: "No user exists with this email" });
       }
 
       // User exists - check password
@@ -74,17 +75,17 @@ router.post("/login", (req, res) => {
               .send({ token, email, firstName, lastName, avatarID });
           } else {
             // Invalid password
-            res.status(401).send({ message: "Invalid password" });
+            next({ status: 401, message: "Invalid password" });
           }
         })
-        .catch((err) => {
+        .catch((err) =>
           // error occurred with bcrypt compare
-          return res.status(500).send(err);
-        });
+          next(err)
+        );
     })
     .catch((err) => {
       // error occurred with query
-      return res.status(500).send(err);
+      next(err);
     });
 });
 
