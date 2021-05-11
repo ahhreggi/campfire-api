@@ -1,14 +1,16 @@
-ENV = process.env.NODE_ENV
+ENV = process.env.NODE_ENV;
 // If ENV exists, load .env.ENV into process.env, else load .env
-require('dotenv').config( ENV ? { path: `.env.${ENV}` } : '' )
+require("dotenv").config(ENV ? { path: `.env.${ENV}` } : "");
 
 // Imports
 const express = require("express");
+const morgan = require("morgan");
 
 // Web server config
 const PORT = process.env.PORT || 3000;
 const app = express();
 app.use(express.json());
+app.use(morgan("tiny"));
 
 // Import Route Handlers
 const debugRoutes = require("./routes/debugRoutes");
@@ -30,5 +32,7 @@ app.use("/api", postRoutes);
 app.use("/api", commentRoutes);
 
 app.listen(PORT, () => {
-  console.log(`Campfire API running on PORT ${PORT} in ${ ENV ? ENV : 'development'} mode!`);
+  console.log(
+    `Campfire API running on PORT ${PORT} in ${ENV ? ENV : "development"} mode!`
+  );
 });
