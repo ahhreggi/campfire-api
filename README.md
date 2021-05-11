@@ -8,7 +8,7 @@ Run test server locally: `npm run test:server`
 
 # Seed Data
 
-All logins are formatted as `hello{id}@campfire.ca` with password: `password`
+All logins are formatted as `hello{id}@campfire.ca`
 
 ### Key users:
 
