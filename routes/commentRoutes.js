@@ -103,7 +103,7 @@ router.patch("/comments/:id", (req, res, next) => {
     })
     .then(() => getCommentById(commentId))
     .then((comment) => res.send(comment))
-    .catch((e) => next(e));
+    .catch((err) => next(err));
 });
 
 router.delete("/comments/:id", (req, res, next) => {
@@ -126,10 +126,10 @@ router.delete("/comments/:id", (req, res, next) => {
       return deleteComment(commentId);
     })
     .then(() => res.send())
-    .catch((e) => next(e));
+    .catch((err) => next(err));
 });
 
-router.post("/comments/:id/like", (req, res) => {
+router.post("/comments/:id/like", (req, res, next) => {
   const { id } = res.locals.decodedToken;
   const commentId = req.params.id;
 
@@ -138,21 +138,23 @@ router.post("/comments/:id/like", (req, res) => {
     .then((role) => {
       if (role) return likeComment(commentId, id);
       else
-        return Promise.reject(
-          "User doesn't have access to the course this comment is posted in"
-        );
+        return Promise.reject({
+          status: 401,
+          message:
+            "User doesn't have access to the course this comment is posted in",
+        });
     })
     .then((result) => res.send())
-    .catch((e) => res.status(500).send({ message: e }));
+    .catch((err) => next(err));
 });
 
-router.post("/comments/:id/unlike", (req, res) => {
+router.post("/comments/:id/unlike", (req, res, next) => {
   const { id } = res.locals.decodedToken;
   const commentId = req.params.id;
 
   unlikeComment(commentId, id)
     .then((result) => res.send())
-    .catch((e) => res.status(500).send({ message: e }));
+    .catch((err) => next(err));
 });
 
 module.exports = router;
