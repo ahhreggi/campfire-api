@@ -1,7 +1,8 @@
 const handleErrors = (err, req, res, next) => {
-  if (err.status && err.message) {
-    res.status(err.status).send({ message: err.message });
-  } else next(err);
+  const { status, message } = err;
+  if (status && message) {
+    res.status(status).send({ message });
+  } else res.status(500).send(err);
 };
 
 module.exports = { handleErrors };
