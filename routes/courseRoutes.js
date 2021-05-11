@@ -10,21 +10,19 @@ const {
 } = require("../db/queries/courses");
 
 // Enrols a user in a course
-router.post("/join", (req, res) => {
+router.post("/join", (req, res, next) => {
   const { id } = res.locals.decodedToken;
   const { accessCode } = req.body;
 
   if (!accessCode) {
-    return res.status(400).send({ message: "Access code is required" });
+    return next({ status: 400, message: "Access code is required" });
   }
 
   getCourseByAccessCode(accessCode).then((result) => {
     if (!result) {
-      return res.status(400).send({ message: "Invalid access code" });
+      return next({ status: 400, message: "Invalid access code" });
     } else if (!result.active) {
-      return res
-        .status(400)
-        .send({ message: "This course is no longer active" });
+      return next({ status: 400, message: "This course is no longer active" });
     } else {
       // User entered valid access code for active course - enrol them
       const role =
@@ -33,19 +31,17 @@ router.post("/join", (req, res) => {
         .then((result) => {
           res.status(201).send({ redirect_to: `/courses/${result.id}` });
         })
-        .catch((err) => res.status(500).send(err));
+        .catch((err) => next(err));
     }
   });
 });
 
 // Creates a new course
-router.post("/create", (req, res) => {
+router.post("/create", (req, res, next) => {
   const { name, description } = req.body;
   const { id } = res.locals.decodedToken;
 
-  if (!name) {
-    return res.status(400).send({ message: "Course name is required" });
-  }
+  if (!name) return next({ status: 400, message: "Course name is required" });
 
   // Generate the access codes
   const courseData = {
@@ -61,17 +57,17 @@ router.post("/create", (req, res) => {
     .then((newCourse) => enrolUserInCourse(id, newCourse.id, "owner"))
     // Instruct frontend to redirect to new course page
     .then((result) => res.send({ redirect_to: `/courses/${result.course_id}` }))
-    .catch((err) => res.status(500).send(err));
+    .catch((err) => next(err));
 });
 
-router.get("/courses", (req, res) => {
+router.get("/courses", (req, res, next) => {
   const { id } = res.locals.decodedToken;
   getCoursesForUser(id)
     .then((courses) => res.send(courses))
-    .catch((e) => res.status(500).send(e));
+    .catch((err) => next(err));
 });
 
-router.get("/courses/:id", (req, res) => {
+router.get("/courses/:id", (req, res, next) => {
   const { id } = res.locals.decodedToken;
   const courseId = parseInt(req.params.id);
   // Check user is student/instructor/owner of the requested course
@@ -82,12 +78,13 @@ router.get("/courses/:id", (req, res) => {
     .then((hasAccess) => {
       if (hasAccess) return getCourseById(courseId, id);
       else
-        return Promise.reject(
-          "User doesn't have permission to access this course"
-        );
+        return Promise.reject({
+          status: 401,
+          message: "User doesn't have permission to access this course",
+        });
     })
     .then((courseData) => res.send(courseData))
-    .catch((e) => res.status(401).send({ message: e }));
+    .catch((e) => next(e));
 });
 
 module.exports = router;
