@@ -4,7 +4,7 @@ const isAuthenticated = function (req, res, next) {
   try {
     // Try to verify/decode the JWT, and append to res.locals if successful
     res.locals.decodedToken = jwt.verify(
-      req.body.token,
+      req.headers.authorization,
       process.env.JWT_SECRET_KEY
     );
     next();
