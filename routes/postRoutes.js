@@ -17,24 +17,24 @@ const router = require("express").Router();
 
 router.post("/posts", (req, res) => {
   const { id } = res.locals.decodedToken;
-  const { courseId, title, body, anonymous } = req.body;
+  const { courseID, title, body, anonymous } = req.body;
 
   // Check fields
-  if (!courseId || !title || !body) {
+  if (!courseID || !title || !body) {
     return res
       .status(400)
-      .send({ message: "courseId, title, body are required" });
+      .send({ message: "courseID, title, body are required" });
   }
 
   getCoursesForUser(id).then((courses) => {
     // Check user has permission to create post in the course
-    if (courses.filter((course) => course.id === courseId).length < 1) {
+    if (courses.filter((course) => course.id === courseID).length < 1) {
       return res
         .status(401)
         .send({ message: "User doesn't have access to this course" });
     }
     // User does have permission - create post
-    createPost({ userId: id, courseId, title, body, anonymous })
+    createPost({ userId: id, courseID, title, body, anonymous })
       .then((result) => res.send(result))
       .catch((e) => res.status(500).send(e));
   });

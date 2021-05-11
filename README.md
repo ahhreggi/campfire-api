@@ -74,7 +74,7 @@ Response object:
     email: string, // user's email
     firstName: string, // user's first name
     lastName: string, // user's last name
-    avatarId: string, // user's avatar id
+    avatarID: string, // user's avatar id
   }
 ```
 
@@ -101,7 +101,7 @@ Response object:
     email: string, // user's email
     firstName: string, // user's first name
     lastName: string, // user's last name
-    avatarId: string, // user's avatar id
+    avatarID: string, // user's avatar id
   }
 ```
 
@@ -309,7 +309,7 @@ Request object:
 
 ```js
   {
-    postId: number, // post id to bookmark
+    postID: number, // post id to bookmark
   }
 ```
 
@@ -323,7 +323,7 @@ Request object:
 
 ```js
   {
-    postId: number, // post id to bookmark
+    postID: number, // post id to bookmark
   }
 ```
 
@@ -339,7 +339,7 @@ Request object:
 
 ```js
   {
-    courseId: number, // course id to post in
+    courseID: number, // course id to post in
     title: string,
     body: string,
     anonymous: boolean, // optional: default false
@@ -430,9 +430,9 @@ Request object:
 
 ```js
   {
-    postId: number,
+    postID: number,
     body: string,
-    parentId: number, // optional, if reply
+    parentID: number, // optional, if reply
     anonymous: boolean, // optional
   }
 ```

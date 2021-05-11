@@ -28,12 +28,12 @@ router.post("/register", (req, res) => {
         // Save was successful
         const firstName = result[0].first_name;
         const lastName = result[0].last_name;
-        const avatarId = result[0].avatar_id;
+        const avatarID = result[0].avatar_id;
         const token = jwt.sign(
           { id: result[0].id },
           process.env.JWT_SECRET_KEY
         );
-        res.status(200).send({ token, email, firstName, lastName, avatarId });
+        res.status(200).send({ token, email, firstName, lastName, avatarID });
       } else {
         res.status(400).send();
       }
@@ -68,10 +68,10 @@ router.post("/login", (req, res) => {
             const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY);
             const firstName = user.first_name;
             const lastName = user.last_name;
-            const avatarId = user.avatar_id;
+            const avatarID = user.avatar_id;
             res
               .status(200)
-              .send({ token, email, firstName, lastName, avatarId });
+              .send({ token, email, firstName, lastName, avatarID });
           } else {
             // Invalid password
             res.status(401).send({ message: "Invalid password" });

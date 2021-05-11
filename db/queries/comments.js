@@ -177,6 +177,18 @@ const unlikeComment = function (commentId, userId) {
     .then((res) => res.rows[0]);
 };
 
+const getCommentsForPost = function (postId) {
+  return db
+    .query(
+      `
+    SELECT * FROM comments
+    WHERE post_id = $1;
+  `,
+      [postId]
+    )
+    .then((res) => res.rows);
+};
+
 module.exports = {
   createComment,
   getCourseRoleFromCommentId,
@@ -188,4 +200,5 @@ module.exports = {
   deleteComment,
   likeComment,
   unlikeComment,
+  getCommentsForPost,
 };

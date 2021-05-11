@@ -3,22 +3,22 @@ const router = require("express").Router();
 
 router.post("/bookmarks", (req, res) => {
   const { id } = res.locals.decodedToken;
-  const { postId } = req.body;
-  if (!postId) {
-    return res.status(400).send({ message: "postId is required" });
+  const { postID } = req.body;
+  if (!postID) {
+    return res.status(400).send({ message: "postID is required" });
   }
-  addBookmark(id, postId)
+  addBookmark(id, postID)
     .then((result) => res.send())
     .catch((e) => res.status(500).send(e));
 });
 
 router.delete("/bookmarks", (req, res) => {
   const { id } = res.locals.decodedToken;
-  const { postId } = req.body;
-  if (!postId) {
-    return res.status(400).send({ message: "postId is required" });
+  const { postID } = req.body;
+  if (!postID) {
+    return res.status(400).send({ message: "postID is required" });
   }
-  deleteBookmark(id, postId)
+  deleteBookmark(id, postID)
     .then((result) => res.send())
     .catch((e) => res.status(500).send(e));
 });

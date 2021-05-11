@@ -12,24 +12,47 @@ const {
   deleteComment,
   likeComment,
   unlikeComment,
+  getCommentsForPost,
 } = require("../db/queries/comments");
 
 const { editable } = require("../helpers/permissionsHelpers");
 
-router.post("/comments", (req, res) => {
+router.post("/comments", (req, res, next) => {
   const { id } = res.locals.decodedToken;
-  const { postId, parentId, body, anonymous } = req.body;
-  getCourseRoleFromPostId(postId, id).then((role) => {
-    if (role === null) {
-      return res
-        .status(401)
-        .send({ message: "User doesn't have rights to post a comment here" });
-    }
+  const { postID, parentID, body, anonymous } = req.body;
 
-    createComment({ postId, parentId, userId: id, body, anonymous })
-      .then((result) => res.send(result))
-      .catch((e) => res.status(500).send(e));
-  });
+  if (!postID || !body) {
+    return next({ status: 400, message: "postID, body are required" });
+  }
+
+  getCourseRoleFromPostId(postID, id)
+    .then((role) => {
+      if (role === null) {
+        return Promise.reject({
+          status: 401,
+          message: "User doesn't have rights to post a comment here",
+        });
+      }
+
+      if (parentID) {
+        // Check parent comment was made on the same post
+        return getCommentsForPost(postID).then((comments) => {
+          if (
+            comments.filter((comment) => comment.id === parentID).length < 1
+          ) {
+            return Promise.reject({
+              status: 400,
+              message: "The provided parentID is not a comment on this post.",
+            });
+          }
+        });
+      }
+    })
+    .then(() =>
+      createComment({ postID, parentID, userId: id, body, anonymous })
+    )
+    .then((result) => res.send(result))
+    .catch((err) => next(err));
 });
 
 router.patch("/comments/:id", (req, res) => {
