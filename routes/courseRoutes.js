@@ -8,10 +8,9 @@ const {
   enrolUserInCourse,
   createCourse,
 } = require("../db/queries/courses");
-const { isAuthenticated } = require("../middleware/authentication");
 
 // Enrols a user in a course
-router.post("/join", isAuthenticated, (req, res) => {
+router.post("/join", (req, res) => {
   const { id } = res.locals.decodedToken;
   const { accessCode } = req.body;
 
@@ -40,7 +39,7 @@ router.post("/join", isAuthenticated, (req, res) => {
 });
 
 // Creates a new course
-router.post("/create", isAuthenticated, (req, res) => {
+router.post("/create", (req, res) => {
   const { name, description } = req.body;
   const { id } = res.locals.decodedToken;
 
@@ -65,14 +64,14 @@ router.post("/create", isAuthenticated, (req, res) => {
     .catch((err) => res.status(500).send(err));
 });
 
-router.get("/courses", isAuthenticated, (req, res) => {
+router.get("/courses", (req, res) => {
   const { id } = res.locals.decodedToken;
   getCoursesForUser(id)
     .then((courses) => res.send(courses))
     .catch((e) => res.status(500).send(e));
 });
 
-router.get("/courses/:id", isAuthenticated, (req, res) => {
+router.get("/courses/:id", (req, res) => {
   const { id } = res.locals.decodedToken;
   const courseId = parseInt(req.params.id);
   // Check user is student/instructor/owner of the requested course

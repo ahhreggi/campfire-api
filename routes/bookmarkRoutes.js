@@ -1,8 +1,7 @@
-const { isAuthenticated } = require("../middleware/authentication");
 const { addBookmark, deleteBookmark } = require("../db/queries/bookmarks");
 const router = require("express").Router();
 
-router.post("/bookmarks", isAuthenticated, (req, res) => {
+router.post("/bookmarks", (req, res) => {
   const { id } = res.locals.decodedToken;
   const { postId } = req.body;
   if (!postId) {
@@ -13,7 +12,7 @@ router.post("/bookmarks", isAuthenticated, (req, res) => {
     .catch((e) => res.status(500).send(e));
 });
 
-router.delete("/bookmarks", isAuthenticated, (req, res) => {
+router.delete("/bookmarks", (req, res) => {
   const { id } = res.locals.decodedToken;
   const { postId } = req.body;
   if (!postId) {

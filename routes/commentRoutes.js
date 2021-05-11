@@ -16,7 +16,7 @@ const {
 
 const { editable } = require("../helpers/permissionsHelpers");
 
-router.post("/comments", isAuthenticated, (req, res) => {
+router.post("/comments", (req, res) => {
   const { id } = res.locals.decodedToken;
   const { postId, parentId, body, anonymous } = req.body;
   getCourseRoleFromPostId(postId, id).then((role) => {
@@ -32,7 +32,7 @@ router.post("/comments", isAuthenticated, (req, res) => {
   });
 });
 
-router.patch("/comments/:id", isAuthenticated, (req, res) => {
+router.patch("/comments/:id", (req, res) => {
   const { id } = res.locals.decodedToken;
   const { body, anonymous } = req.body;
   const commentId = req.params.id;
@@ -65,7 +65,7 @@ router.patch("/comments/:id", isAuthenticated, (req, res) => {
     .catch((e) => res.status(400).send({ message: e }));
 });
 
-router.delete("/comments/:id", isAuthenticated, (req, res) => {
+router.delete("/comments/:id", (req, res) => {
   const { id } = res.locals.decodedToken;
   const commentId = req.params.id;
 
@@ -84,7 +84,7 @@ router.delete("/comments/:id", isAuthenticated, (req, res) => {
     .catch((e) => res.status(400).send({ message: e }));
 });
 
-router.post("/comments/:id/like", isAuthenticated, (req, res) => {
+router.post("/comments/:id/like", (req, res) => {
   const { id } = res.locals.decodedToken;
   const commentId = req.params.id;
 
@@ -101,7 +101,7 @@ router.post("/comments/:id/like", isAuthenticated, (req, res) => {
     .catch((e) => res.status(500).send({ message: e }));
 });
 
-router.post("/comments/:id/unlike", isAuthenticated, (req, res) => {
+router.post("/comments/:id/unlike", (req, res) => {
   const { id } = res.locals.decodedToken;
   const commentId = req.params.id;
 

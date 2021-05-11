@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const { userIsAdmin } = require("../db/queries/users");
 
 const isAuthenticated = function (req, res, next) {
   try {
@@ -13,6 +14,12 @@ const isAuthenticated = function (req, res, next) {
   }
 };
 
-const isNotAuthenticated = function (req, res, next) {};
+const isAdmin = function (req, res, next) {
+  const { id } = res.locals.decodedToken;
+  userIsAdmin(id).then((admin) => {
+    if (admin) next();
+    else next({ status: 401, message: "User is not an admin" });
+  });
+};
 
-module.exports = { isAuthenticated };
+module.exports = { isAuthenticated, isAdmin };

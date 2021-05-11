@@ -41,4 +41,17 @@ const getUserByEmail = function (email) {
     .then((res) => res.rows[0]);
 };
 
-module.exports = { createUser, getUserByEmail };
+const userIsAdmin = function (userId) {
+  return db
+    .query(
+      `
+    SELECT is_admin
+    FROM users
+    WHERE id = $1;
+  `,
+      [userId]
+    )
+    .then((res) => res.rows[0].is_admin);
+};
+
+module.exports = { createUser, getUserByEmail, userIsAdmin };

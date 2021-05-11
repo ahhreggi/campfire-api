@@ -13,10 +13,9 @@ const {
   getPostById,
 } = require("../db/queries/posts");
 const { editable } = require("../helpers/permissionsHelpers");
-const { isAuthenticated } = require("../middleware/authentication");
 const router = require("express").Router();
 
-router.post("/posts", isAuthenticated, (req, res) => {
+router.post("/posts", (req, res) => {
   const { id } = res.locals.decodedToken;
   const { courseId, title, body, anonymous } = req.body;
 
@@ -41,7 +40,7 @@ router.post("/posts", isAuthenticated, (req, res) => {
   });
 });
 
-router.patch("/posts/:id", isAuthenticated, (req, res) => {
+router.patch("/posts/:id", (req, res) => {
   const { id } = res.locals.decodedToken;
   const postId = req.params.id;
   const { title, body, best_answer, anonymous, pinned } = req.body;
@@ -87,7 +86,7 @@ router.patch("/posts/:id", isAuthenticated, (req, res) => {
     .catch((e) => res.status(400).send({ message: e }));
 });
 
-router.delete("/posts/:id", isAuthenticated, (req, res) => {
+router.delete("/posts/:id", (req, res) => {
   const { id } = res.locals.decodedToken;
   const postId = req.params.id;
   // Check if user has edit permissions on the post
