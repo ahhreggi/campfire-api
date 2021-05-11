@@ -81,12 +81,8 @@ const getCourseRole = function (courseId, userId) {
 };
 
 const createCourse = function (courseData) {
-  const {
-    name,
-    description,
-    studentAccessCode,
-    instructorAccessCode,
-  } = courseData;
+  const { name, description, studentAccessCode, instructorAccessCode } =
+    courseData;
   return db
     .query(
       `
@@ -160,7 +156,8 @@ const getCourseById = function (id, userId) {
       END AS role,
       user_id
     FROM posts
-    WHERE course_id = $1;
+    WHERE course_id = $1
+    AND active = TRUE;
   `,
     [id, userId]
   );
@@ -186,7 +183,8 @@ const getCourseById = function (id, userId) {
       user_id
     FROM comments
     WHERE post_id in (SELECT id FROM posts WHERE course_id = $1)
-    AND parent_id IS NULL;
+    AND parent_id IS NULL
+    AND active = TRUE;
   `,
     [id]
   );
@@ -211,6 +209,7 @@ const getCourseById = function (id, userId) {
       user_id
     FROM comments
     WHERE parent_id IN (SELECT id FROM comments WHERE post_id IN (SELECT id FROM posts WHERE course_id = $1))
+    AND active = TRUE;
   `,
     [id]
   );
