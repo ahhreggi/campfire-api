@@ -84,7 +84,7 @@ router.get("/courses/:id", (req, res, next) => {
         });
     })
     .then((courseData) => res.send(courseData))
-    .catch((e) => next(e));
+    .catch((err) => next(err));
 });
 
 module.exports = router;
