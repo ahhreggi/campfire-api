@@ -44,6 +44,21 @@ router.patch("/posts/:id", (req, res, next) => {
   const postId = req.params.id;
   const { title, body, best_answer, anonymous, pinned } = req.body;
 
+  // Check we were given something to edit
+  if (
+    !title &&
+    !body &&
+    !best_answer &&
+    anonymous === undefined &&
+    pinned === undefined
+  ) {
+    return next({
+      status: 400,
+      message:
+        "Must provide one of: title, body, best_answer, anonymous, pinned",
+    });
+  }
+
   // Check if user has edit permissions on the post
   const rolePromise = getCourseRoleFromPostId(postId, id);
   const posterRolePromise = getPostersCourseRole(postId);
