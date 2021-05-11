@@ -1,3 +1,3 @@
-SELECT *
-FROM comment_likes
-WHERE user_id = 10;
+SELECT parent_id
+FROM comments
+WHERE id = 14;
