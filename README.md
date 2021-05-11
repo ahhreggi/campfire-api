@@ -1,7 +1,5 @@
 # Info & Setup
 
-Development server: `139.177.195.214`
-
 Run dev server locally: `npm start`
 
 Run test server locally: `npm run test:server`
@@ -31,13 +29,19 @@ All logins are formatted as `hello{id}@campfire.ca` with password: `password`
 
 ---
 
+## **Authorization**
+
+All routes (except login and register) require a valid JSON Web Token to be set in the 'Authorization' header. The token is sent as a response to the login/register routes.
+
+---
+
 # Routes
 
 ## **Debug**
 
 ### `GET /api/debug/reset_db`
 
-Resets and reseeds the database.
+Resets and re-seeds the database.
 
 ---
 
@@ -51,7 +55,6 @@ Request object:
 
 ```js
   {
-    token: string, // JWT
     firstName: string, // user's first name
     lastName: string, // user's last name
     email: string, // user's email
@@ -67,7 +70,7 @@ Response object:
 
 ```js
   {
-    token: string, // JWT
+    token: string, // JSON Web Token - required for all future requests
     email: string, // user's email
     firstName: string, // user's first name
     lastName: string, // user's last name
@@ -85,7 +88,6 @@ Request object:
 
 ```js
   {
-    token: string, // JWT
     email: string, // user's email
     password: string, // user's password
   }
@@ -95,7 +97,7 @@ Response object:
 
 ```js
   {
-    token: string, // JWT
+    token: string, // JSON Web Token - required for all future requests
     email: string, // user's email
     firstName: string, // user's first name
     lastName: string, // user's last name
@@ -115,15 +117,13 @@ Request object:
 
 ```js
 {
-  token: string, // JWT
   accessCode: string, // the instructor or student access code for the course
 }
 ```
 
 Requirements:
 
-1. user must be logged in
-2. access code must exist & course must be active
+1. access code must exist & course must be active
 
 Response object:
 
@@ -143,7 +143,6 @@ Request object:
 
 ```js
   {
-    token: string, // JWT
     name: string, // new course name
     description: string, // new course description (optional)
   }
@@ -169,14 +168,6 @@ Response object:
 
 Get all courses for the user.
 
-Request object:
-
-```js
-{
-  token: string, // JWT
-}
-```
-
 Response object:
 
 ```js
@@ -197,18 +188,9 @@ Response object:
 
 Get data for a specific course.
 
-Request object:
-
-```js
-  {
-    token: string, // JWT
-  }
-```
-
 Requirements:
 
-1. user must be logged in
-2. user must be enrolled in the course as a student, instructor, or owner, or be an admin
+1. user must be enrolled in the course as a student, instructor, or owner, or be an admin
 
 Response object:
 
@@ -327,7 +309,6 @@ Request object:
 
 ```js
   {
-    token: string, // JWT
     postId: number, // post id to bookmark
   }
 ```
@@ -342,7 +323,6 @@ Request object:
 
 ```js
   {
-    token: string, // JWT
     postId: number, // post id to bookmark
   }
 ```
@@ -359,7 +339,6 @@ Request object:
 
 ```js
   {
-    token: string, // JWT
     courseId: number, // course id to post in
     title: string,
     body: string,
@@ -398,7 +377,6 @@ Request object:
 
 ```js
   {
-    token: string, // JWT
     title: string, // optional - will update last_modified
     body: string, // optional - will update last_modified
     best_answer: number, // optional
@@ -436,13 +414,9 @@ Response object is the updated post:
 
 Delete a post.
 
-Request object:
+Requirements:
 
-```js
-  {
-    token: string, // JWT
-  }
-```
+1. user has rights to edit this post
 
 ---
 
@@ -456,7 +430,6 @@ Request object:
 
 ```js
   {
-    token: string, // JWT
     postId: number,
     body: string,
     parentId: number, // optional, if reply
@@ -494,7 +467,6 @@ Request body:
 
 ```js
   {
-    token: string, // JWT
     body: string, // optional
     anonymous: boolean, // optional
   }
@@ -526,14 +498,6 @@ Return object is updated comment object:
 
 Delete a comment.
 
-Request object:
-
-```js
-  {
-    token: string, // JWT
-  }
-```
-
 Requirements:
 
 1. user has rights to edit this comment
@@ -544,14 +508,6 @@ Requirements:
 
 Like a comment.
 
-Request object:
-
-```js
-  {
-    token: string, // JWT
-  }
-```
-
 Requirements:
 
 1. user has access to the course the comment is posted in
@@ -561,11 +517,3 @@ Requirements:
 ### `POST /api/comments/:id/unlike`
 
 Remove a like from a comment.
-
-Request object:
-
-```js
-  {
-    token: string, // JWT
-  }
-```
