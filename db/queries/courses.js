@@ -15,13 +15,13 @@ const role = function (courseID, userID) {
     .then((res) => res.rows[0].role);
 };
 
-const forUser = function (userId) {
+const forUser = function (userID) {
   return db
     .query(
       `
     SELECT is_admin FROM users WHERE id = $1
   `,
-      [userId]
+      [userID]
     )
     .then((res) => {
       if (res.rows[0].is_admin) {
@@ -46,70 +46,56 @@ const forUser = function (userId) {
           WHERE users.id = $1
           AND courses.active = true;
         `,
-            [userId]
+            [userID]
           )
           .then((res) => res.rows);
       }
     });
 };
 
-const getCourseByAccessCode = function (accessCode) {
+const byAccessCode = function (accessCode) {
   return db
     .query(
       `
-    SELECT *
-    FROM courses
-    WHERE student_access_code = $1
-    OR instructor_access_code = $1;
+      SELECT *
+      FROM courses
+      WHERE student_access_code = $1
+      OR instructor_access_code = $1;
   `,
       [accessCode]
     )
     .then((res) => res.rows[0]);
 };
 
-const enrolUserInCourse = function (userId, courseId, role) {
+const enrol = function (userID, courseID, role) {
   return db
     .query(
       `
-    INSERT INTO enrolments (user_id, course_id, role)
-    VALUES ($1, $2, $3)
-    RETURNING *;
+      INSERT INTO enrolments (user_id, course_id, role)
+      VALUES ($1, $2, $3)
+      RETURNING *;
   `,
-      [userId, courseId, role]
+      [userID, courseID, role]
     )
     .then((res) => res.rows[0]);
 };
 
-const getCourseRole = function (courseId, userId) {
-  return db
-    .query(
-      `
-    SELECT 
-    CASE WHEN (SELECT is_admin FROM users WHERE id = $2) = TRUE THEN 'admin'
-    ELSE (SELECT role FROM enrolments WHERE user_id = $2 AND course_id = $1)
-    END AS role
-  `,
-      [courseId, userId]
-    )
-    .then((res) => res.rows[0].role);
-};
-
-const createCourse = function (courseData) {
+const create = function (courseData) {
   const { name, description, studentAccessCode, instructorAccessCode } =
     courseData;
   return db
     .query(
       `
-    INSERT INTO courses (name, description, student_access_code, instructor_access_code)
-    VALUES ($1, $2, $3, $4)
-    RETURNING *;
+      INSERT INTO courses (name, description, student_access_code, instructor_access_code)
+      VALUES ($1, $2, $3, $4)
+      RETURNING *;
   `,
       [name, description, studentAccessCode, instructorAccessCode]
     )
     .then((res) => res.rows[0]);
 };
 
-const getCourseById = function (id, userId) {
+const byId = function (courseID, userID) {
   const courseDataPromise = db.query(
     `
     SELECT 
@@ -127,7 +113,7 @@ const getCourseById = function (id, userId) {
     FROM courses
     WHERE id = $1;
   `,
-    [id]
+    [courseID]
   );
 
   const courseRolePromise = db.query(
@@ -137,7 +123,7 @@ const getCourseById = function (id, userId) {
       ELSE (SELECT role FROM enrolments WHERE user_id = $2 AND course_id = $1)
     END AS role
   `,
-    [id, userId]
+    [courseID, userID]
   );
 
   const courseTagsPromise = db.query(
@@ -145,7 +131,7 @@ const getCourseById = function (id, userId) {
     SELECT id, name FROM tags
     WHERE course_id = $1;
   `,
-    [id]
+    [courseID]
   );
 
   const coursePostsPromise = db.query(
@@ -173,7 +159,7 @@ const getCourseById = function (id, userId) {
     WHERE course_id = $1
     AND active = TRUE;
   `,
-    [id, userId]
+    [courseID, userID]
   );
 
   const courseCommentsPromise = db.query(
@@ -200,7 +186,7 @@ const getCourseById = function (id, userId) {
     AND parent_id IS NULL
     AND active = TRUE;
   `,
-    [id]
+    [courseID]
   );
 
   const courseCommentRepliesPromise = db.query(
@@ -225,7 +211,7 @@ const getCourseById = function (id, userId) {
     WHERE parent_id IN (SELECT id FROM comments WHERE post_id IN (SELECT id FROM posts WHERE course_id = $1))
     AND active = TRUE;
   `,
-    [id]
+    [courseID]
   );
 
   const coursePostTagsPromise = db.query(
@@ -234,7 +220,7 @@ const getCourseById = function (id, userId) {
     JOIN post_tags ON tags.id = tag_id
     WHERE course_id = $1;
   `,
-    [id]
+    [courseID]
   );
 
   const commentLikesPromise = db.query(
@@ -243,7 +229,7 @@ const getCourseById = function (id, userId) {
     FROM comment_likes
     WHERE user_id = $1;
   `,
-    [userId]
+    [userID]
   );
 
   const commentEndorsementsPromise = db.query(`
@@ -312,7 +298,7 @@ const getCourseById = function (id, userId) {
       tags: courseTags.rows,
       posts: coursePosts.rows.map((post) => ({
         ...post,
-        editable: editable(role, post.role, userId, post.user_id),
+        editable: editable(role, post.role, userID, post.user_id),
         pinnable: pinnable(role),
         tags: coursePostTags.rows
           .filter((postTag) => postTag.post_id === post.id)
@@ -325,7 +311,7 @@ const getCourseById = function (id, userId) {
           .map((comment) => ({
             ...comment,
             score: parseInt(comment.score),
-            editable: editable(role, comment.role, userId, comment.user_id),
+            editable: editable(role, comment.role, userID, comment.user_id),
             endorsable: endorsable(role),
             liked:
               commentLikes.rows.filter((like) => like.comment_id === comment.id)
@@ -338,7 +324,7 @@ const getCourseById = function (id, userId) {
               .map((reply) => ({
                 ...reply,
                 score: parseInt(reply.score),
-                editable: editable(role, reply.role, userId, reply.user_id),
+                editable: editable(role, reply.role, userID, reply.user_id),
                 endorsable: endorsable(role),
                 liked:
                   commentLikes.rows.filter(
@@ -379,7 +365,11 @@ const getCourseById = function (id, userId) {
   });
 };
 
-// helper function -- strips author name and avatar from posts/comments/replies
+/*
+ * Helper functions
+ */
+
+// strips author name and avatar from posts/comments/replies
 const anonymize = function (obj) {
   delete obj.author_first_name;
   delete obj.author_last_name;
@@ -395,9 +385,8 @@ const pinnable = endorsable;
 module.exports = {
   role,
   forUser,
-  getCourseById,
-  getCourseRole,
-  getCourseByAccessCode,
-  enrolUserInCourse,
-  createCourse,
+  byId,
+  byAccessCode,
+  enrol,
+  create,
 };
