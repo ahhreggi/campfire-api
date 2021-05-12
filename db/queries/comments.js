@@ -40,11 +40,7 @@ const isReply = function (commentID) {
       [commentID]
     )
     .then((res) => {
-      if (!res.rows[0])
-        return Promise.reject({
-          status: 404,
-          message: `Comment ${commentID} doesn't exist`,
-        });
+      if (!res.rows[0]) return invalidCommentID(commentID);
       return Boolean(res.rows[0].parent_id);
     });
 };
@@ -66,11 +62,7 @@ const course = function (commentID) {
       [commentID]
     )
     .then((res) => {
-      if (!res.rows[0])
-        return Promise.reject({
-          status: 404,
-          message: `Comment ${commentID} doesn't exist`,
-        });
+      if (!res.rows[0]) return invalidCommentID(commentID);
       return res.rows[0].id;
     });
 };
@@ -101,7 +93,10 @@ const role = function (commentID) {
   `,
       [commentID]
     )
-    .then((res) => res.rows[0].role);
+    .then((res) => {
+      if (!res.rows[0]) return invalidCommentID(commentID);
+      return res.rows[0].role;
+    });
 };
 
 /**
@@ -119,7 +114,10 @@ const author = function (commentID) {
   `,
       [commentID]
     )
-    .then((res) => res.rows[0].user_id);
+    .then((res) => {
+      if (!res.rows[0]) return invalidCommentID(commentID);
+      return res.rows[0].user_id;
+    });
 };
 
 /**
@@ -149,15 +147,17 @@ const setBody = function (commentID, body) {
  * @returns {Promise}            A promise that resolves to the updated comment.
  */
 const setAnonymity = function (commentID, anonymous) {
-  return db.query(
-    `
+  return db
+    .query(
+      `
     UPDATE comments
     SET anonymous = $2
     WHERE id = $1
     RETURNING *;
   `,
-    [commentID, anonymous]
-  );
+      [commentID, anonymous]
+    )
+    .then((res) => res.rows[0]);
 };
 
 /**
@@ -252,6 +252,13 @@ const forPost = function (postID) {
       [postID]
     )
     .then((res) => res.rows);
+};
+
+const invalidCommentID = function (commentID) {
+  return Promise.reject({
+    status: 404,
+    message: `Comment ${commentID} doesn't exist`,
+  });
 };
 
 module.exports = {
