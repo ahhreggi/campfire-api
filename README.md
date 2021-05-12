@@ -226,7 +226,7 @@ Response object:
         author_last_name: string, // undefined if post is marked as anonymous and user is not privileged
         author_avatar_id: number, // '1' if post is marked as anonymous and user is not privileged
         pinned: boolean,
-        views: int, // TODO: total number of times post has been viewed
+        views: number, // number of times post has been viewed by a logged-in user
         anonymous: boolean, // if poster has request anonymity
         role: string, // role of the poster (student/instructor/owner/admin)
         user_id: number,
@@ -406,7 +406,7 @@ Response object is the updated post:
     anonymous: boolean,
     active: boolean,
     pinned: boolean,
-    views: boolean,
+    views: number,
   }
 ```
 
@@ -419,6 +419,16 @@ Delete a post.
 Requirements:
 
 1. user has rights to edit this post
+
+---
+
+### `POST /api/posts/:id/view`
+
+View a post.
+
+Requirements:
+
+1. user has access to this post
 
 ---
 

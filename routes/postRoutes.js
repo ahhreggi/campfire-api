@@ -131,4 +131,32 @@ router.delete("/posts/:id", (req, res, next) => {
     .catch((err) => next(err));
 });
 
+router.post("/posts/:id/view", (req, res, next) => {
+  const { id: userID } = res.locals.decodedToken;
+  const postID = req.params.id;
+  // Check user has access to the post
+  Posts.course(postID)
+    .then((courseID) => Courses.role(courseID, userID))
+    .then((role) => {
+      if (!role)
+        return Promise.reject({
+          status: 400,
+          message: "User doesn't have access to this course",
+        });
+      // Increment post views
+      return Posts.view(postID, userID);
+    })
+    .then((result) => res.send())
+    .catch((err) => {
+      if (err.code === "23505") {
+        // If user has already viewed the post, don't send an error.
+        return res.send({
+          message:
+            "User has already viewed this post - not increasing view count",
+        });
+      }
+      next(err);
+    });
+});
+
 module.exports = router;

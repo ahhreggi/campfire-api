@@ -186,7 +186,7 @@ const byId = function (courseID, userID) {
       (SELECT last_name FROM users WHERE id = posts.user_id) AS author_last_name,
       (SELECT avatar_id FROM users WHERE id = posts.user_id) AS author_avatar_id,
       pinned,
-      views,
+      (SELECT COUNT(*) FROM post_views WHERE post_id = posts.id) AS views,
       anonymous,
       CASE  
         WHEN (SELECT is_admin FROM users WHERE id = posts.user_id) = TRUE THEN 'admin'

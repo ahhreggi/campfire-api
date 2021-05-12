@@ -6,6 +6,7 @@ DROP TABLE IF EXISTS comment_endorsements CASCADE;
 DROP TABLE IF EXISTS comment_likes CASCADE;
 DROP TABLE IF EXISTS tags CASCADE;
 DROP TABLE IF EXISTS post_tags CASCADE;
+DROP TABLE IF EXISTS post_views CASCADE;
 DROP TABLE IF EXISTS bookmarks CASCADE;
 DROP TABLE IF EXISTS courses CASCADE;
 DROP TABLE IF EXISTS enrolments CASCADE;
@@ -78,6 +79,13 @@ CREATE TABLE "post_tags" (
   "post_id" int
 );
 
+CREATE TABLE "post_views" (
+  "id" SERIAL PRIMARY KEY,
+  "post_id" int,
+  "user_id" int,
+  UNIQUE("post_id", "user_id")
+);
+
 CREATE TABLE "bookmarks" (
   "id" SERIAL PRIMARY KEY,
   "user_id" int,
@@ -128,6 +136,10 @@ ALTER TABLE "tags" ADD FOREIGN KEY ("course_id") REFERENCES "courses" ("id");
 ALTER TABLE "post_tags" ADD FOREIGN KEY ("tag_id") REFERENCES "tags" ("id");
 
 ALTER TABLE "post_tags" ADD FOREIGN KEY ("post_id") REFERENCES "posts" ("id");
+
+ALTER TABLE "post_views" ADD FOREIGN KEY ("post_id") REFERENCES "posts" ("id");
+
+ALTER TABLE "post_views" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 
 ALTER TABLE "bookmarks" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 

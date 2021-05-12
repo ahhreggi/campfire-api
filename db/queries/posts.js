@@ -132,6 +132,25 @@ const role = function (postID) {
 /**
  *
  * @param {number} postID    The post ID.
+ * @param {number} userID    The user's ID.
+ * @returns {Promise}        A promise that resolves to the post_views object.
+ */
+const view = function (postID, userID) {
+  return db
+    .query(
+      `
+    INSERT INTO post_views (post_id, user_id)
+    VALUES ($1, $2)
+    RETURNING *;
+  `,
+      [postID, userID]
+    )
+    .then((res) => res.rows[0]);
+};
+
+/**
+ *
+ * @param {number} postID    The post ID.
  * @returns {Promise}        A promise that resolves to the post author's user_id.
  */
 const author = function (postID) {
@@ -293,6 +312,7 @@ module.exports = {
   course,
   getByID,
   role,
+  view,
   author,
   setTitle,
   setBody,
