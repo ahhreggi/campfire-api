@@ -5,6 +5,7 @@ const { canEditComment } = require("../helpers/permissionsHelpers");
 const Courses = require("../db/queries/courses");
 const Posts = require("../db/queries/posts");
 
+// Create a comment
 router.post("/comments", (req, res, next) => {
   const { id: userID } = res.locals.decodedToken;
   const { postID, parentID, body, anonymous } = req.body;
@@ -56,6 +57,7 @@ router.post("/comments", (req, res, next) => {
     .catch((err) => next(err));
 });
 
+// Update a comment
 router.patch("/comments/:id", (req, res, next) => {
   const { id: userID } = res.locals.decodedToken;
   const { body, anonymous } = req.body;
@@ -88,6 +90,7 @@ router.patch("/comments/:id", (req, res, next) => {
     .catch((err) => next(err));
 });
 
+// Delete a comment
 router.delete("/comments/:id", (req, res, next) => {
   const { id: userID } = res.locals.decodedToken;
   const commentID = req.params.id;
@@ -107,6 +110,7 @@ router.delete("/comments/:id", (req, res, next) => {
     .catch((err) => next(err));
 });
 
+// Like a comment
 router.post("/comments/:id/like", (req, res, next) => {
   const { id: userID } = res.locals.decodedToken;
   const commentID = req.params.id;
@@ -135,6 +139,7 @@ router.post("/comments/:id/like", (req, res, next) => {
     });
 });
 
+// Unlike a comment
 router.post("/comments/:id/unlike", (req, res, next) => {
   const { id: userID } = res.locals.decodedToken;
   const commentID = req.params.id;
