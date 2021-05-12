@@ -4,6 +4,7 @@ const { canEditPost } = require("../helpers/permissionsHelpers");
 const router = require("express").Router();
 const { roles } = require("../db/queries/users");
 
+// Create a new post
 router.post("/posts", (req, res, next) => {
   const { id: userID } = res.locals.decodedToken;
   const { courseID, title, body, anonymous } = req.body;
@@ -28,6 +29,7 @@ router.post("/posts", (req, res, next) => {
   });
 });
 
+// Update a post
 router.patch("/posts/:id", (req, res, next) => {
   const { id: userID } = res.locals.decodedToken;
   const postID = req.params.id;
@@ -76,12 +78,10 @@ router.patch("/posts/:id", (req, res, next) => {
       }
 
       if (pinned === true || pinned === false) {
-        console.log("here");
         // Only allow instructors / owners / admins to pin posts
         queries.push(
           Posts.course(postID).then((courseID) =>
             Courses.role(courseID, userID).then((role) => {
-              console.log("role", role);
               if (
                 role === roles.INSTRUCTOR ||
                 role === roles.OWNER ||
@@ -106,6 +106,7 @@ router.patch("/posts/:id", (req, res, next) => {
     .catch((err) => next(err));
 });
 
+// Delete a post
 router.delete("/posts/:id", (req, res, next) => {
   const { id: userID } = res.locals.decodedToken;
   const postID = req.params.id;
