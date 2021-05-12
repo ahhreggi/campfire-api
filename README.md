@@ -342,7 +342,7 @@ Request object:
     courseID: number, // course id to post in
     title: string,
     body: string,
-    // TODO tags: [id],
+    tags: [id],
     anonymous: boolean, // optional: default false
   }
 ```
@@ -380,7 +380,7 @@ Request object:
   {
     title: string,        // optional - will update last_modified
     body: string,         // optional - will update last_modified
-    //TODO tags: [id],           // optional
+    tags: [id],           // optional
     anonymous: boolean,   // optional
     best_answer: number,  // optional
     pinned: boolean,      // optional
