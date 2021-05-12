@@ -21,9 +21,9 @@ router.post("/register", (req, res, next) => {
   bcrypt
     .hash(password, 10)
     // Save the user
-    .then((hash) =>
-      Users.create({ firstName, lastName, email, hash, avatarID })
-    )
+    .then((hash) => {
+      return Users.create({ firstName, lastName, email, hash, avatarID });
+    })
     .then((result) => {
       if (result.length > 0) {
         // Save was successful
@@ -61,18 +61,19 @@ router.post("/login", (req, res, next) => {
   if (!email || !password) {
     return next({ status: 400, message: "email, password are required" });
   }
-
   // Find user
   Users.byEmail(email)
     .then((user) => {
       if (!user) {
         return next({ status: 400, message: "No user exists with this email" });
       }
-
       // User exists - check password
-      return bcrypt.compare(password, user.password);
+      return Promise.all([
+        bcrypt.compare(password, user.password),
+        Promise.resolve(user),
+      ]);
     })
-    .then((match) => {
+    .then(([match, user]) => {
       if (match) {
         // Valid login - set JWT and send
         const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY);
