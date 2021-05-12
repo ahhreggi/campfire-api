@@ -6,7 +6,7 @@ const Users = require("../db/queries/users");
 // Register a new user
 router.post("/register", (req, res, next) => {
   // Check form is valid
-  let { firstName, lastName, email, password } = req.body;
+  const { firstName, lastName, email, password } = req.body;
   if (!firstName || !lastName || !email || !password) {
     return next({
       status: 400,
@@ -14,14 +14,16 @@ router.post("/register", (req, res, next) => {
     });
   }
 
-  // Hash password
-  password = bcrypt.hashSync(password, 10);
-
   // Generate random avatar id
   const avatarID = Math.floor(Math.random() * 22) + 2;
 
-  // Save the user
-  Users.create({ firstName, lastName, email, password, avatarID })
+  // Hash password
+  bcrypt
+    .hash(password, 10)
+    // Save the user
+    .then((hash) =>
+      Users.create({ firstName, lastName, email, hash, avatarID })
+    )
     .then((result) => {
       if (result.length > 0) {
         // Save was successful

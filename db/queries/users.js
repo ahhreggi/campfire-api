@@ -13,12 +13,12 @@ const roles = {
  * @param {string} user.firstName - The user's first name.
  * @param {string} user.lastName - The user's last name.
  * @param {string} user.email - The user's email address.
- * @param {string} user.password - The user's hashed password.
+ * @param {string} user.hash - The user's hashed password.
  * @param {number} user.avatarID - The user's avatar ID.
  * @returns {Promise} Promise that resolves to the new user object (minus password).
  */
 const create = function (user) {
-  const { firstName, lastName, email, password, avatarID } = user;
+  const { firstName, lastName, email, hash, avatarID } = user;
   return db
     .query(
       `
@@ -26,7 +26,7 @@ const create = function (user) {
     VALUES ($1, $2, $3, $4, $5)
     RETURNING email, first_name, last_name, avatar_id;
   `,
-      [firstName, lastName, email, password, avatarID]
+      [firstName, lastName, email, hash, avatarID]
     )
     .then((res) => res.rows);
 };
