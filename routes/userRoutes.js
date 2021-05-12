@@ -2,7 +2,7 @@ const router = require("express").Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-const { createUser, getUserByEmail } = require("../db/queries/users");
+const Users = require("../db/queries/users");
 
 // Register a new user
 router.post("/register", (req, res, next) => {
@@ -19,10 +19,10 @@ router.post("/register", (req, res, next) => {
   password = bcrypt.hashSync(password, 10);
 
   // Generate random avatar id
-  const avatarId = Math.floor(Math.random() * 22) + 2;
+  const avatarID = Math.floor(Math.random() * 22) + 2;
 
   // Save the user
-  createUser({ firstName, lastName, email, password, avatarId })
+  Users.create({ firstName, lastName, email, password, avatarID })
     .then((result) => {
       if (result.length > 0) {
         // Save was successful
@@ -41,7 +41,15 @@ router.post("/register", (req, res, next) => {
         });
       }
     })
-    .catch((err) => next(err));
+    .catch((err) => {
+      if (err.code === "23505") {
+        return next({
+          status: 400,
+          message: "User with this email already exists",
+        });
+      }
+      next(err);
+    });
 });
 
 // Log a user in
@@ -54,39 +62,29 @@ router.post("/login", (req, res, next) => {
   }
 
   // Find user
-  getUserByEmail(email)
+  Users.byEmail(email)
     .then((user) => {
       if (!user) {
         return next({ status: 400, message: "No user exists with this email" });
       }
 
       // User exists - check password
-      bcrypt
-        .compare(password, user.password)
-        .then((match) => {
-          if (match) {
-            // Valid login - set JWT and send
-            const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY);
-            const firstName = user.first_name;
-            const lastName = user.last_name;
-            const avatarID = user.avatar_id;
-            res
-              .status(200)
-              .send({ token, email, firstName, lastName, avatarID });
-          } else {
-            // Invalid password
-            next({ status: 401, message: "Invalid password" });
-          }
-        })
-        .catch((err) =>
-          // error occurred with bcrypt compare
-          next(err)
-        );
+      return bcrypt.compare(password, user.password);
     })
-    .catch((err) => {
-      // error occurred with query
-      next(err);
-    });
+    .then((match) => {
+      if (match) {
+        // Valid login - set JWT and send
+        const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY);
+        const firstName = user.first_name;
+        const lastName = user.last_name;
+        const avatarID = user.avatar_id;
+        res.status(200).send({ token, email, firstName, lastName, avatarID });
+      } else {
+        // Invalid password
+        next({ status: 401, message: "Invalid password" });
+      }
+    })
+    .catch((err) => next(err));
 });
 
 module.exports = router;

@@ -1,6 +1,5 @@
 const router = require("express").Router();
 const uuid = require("uuid");
-
 const Courses = require("../db/queries/courses");
 
 // Enrols a user in a course

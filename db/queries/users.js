@@ -16,8 +16,8 @@ const roles = {
  * @param {string} user.password - The user's hashed password.
  * @returns {Promise} Promise that resolves to true if user was saved successfully.
  */
-const createUser = function (user) {
-  const { firstName, lastName, email, password, avatarId } = user;
+const create = function (user) {
+  const { firstName, lastName, email, password, avatarID } = user;
   return db
     .query(
       `
@@ -25,7 +25,7 @@ const createUser = function (user) {
     VALUES ($1, $2, $3, $4, $5)
     RETURNING email, first_name, last_name, avatar_id;
   `,
-      [firstName, lastName, email, password, avatarId]
+      [firstName, lastName, email, password, avatarID]
     )
     .then((res) => res.rows);
 };
@@ -35,7 +35,7 @@ const createUser = function (user) {
  * @param {string} email - The user's email address
  * @returns {Object} User object
  */
-const getUserByEmail = function (email) {
+const byEmail = function (email) {
   return db
     .query(
       `
@@ -48,7 +48,7 @@ const getUserByEmail = function (email) {
     .then((res) => res.rows[0]);
 };
 
-const userIsAdmin = function (userId) {
+const isAdmin = function (userId) {
   return db
     .query(
       `
@@ -61,4 +61,4 @@ const userIsAdmin = function (userId) {
     .then((res) => res.rows[0].is_admin);
 };
 
-module.exports = { createUser, getUserByEmail, userIsAdmin, roles };
+module.exports = { create, byEmail, isAdmin, roles };
