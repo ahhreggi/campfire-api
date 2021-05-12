@@ -2,7 +2,7 @@ const router = require("express").Router();
 const uuid = require("uuid");
 
 const {
-  getCoursesForUser,
+  forUser,
   getCourseById,
   getCourseByAccessCode,
   enrolUserInCourse,
@@ -62,7 +62,7 @@ router.post("/create", (req, res, next) => {
 
 router.get("/courses", (req, res, next) => {
   const { id } = res.locals.decodedToken;
-  getCoursesForUser(id)
+  forUser(id)
     .then((courses) => res.send(courses))
     .catch((err) => next(err));
 });
@@ -72,7 +72,7 @@ router.get("/courses/:id", (req, res, next) => {
   const courseId = parseInt(req.params.id);
   // Check user is student/instructor/owner of the requested course
   // If so, fetch and return it
-  getCoursesForUser(id)
+  forUser(id)
     .then((courses) => courses.map((course) => course.id))
     .then((courseIds) => courseIds.includes(courseId))
     .then((hasAccess) => {
