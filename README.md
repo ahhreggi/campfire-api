@@ -55,10 +55,10 @@ Request object:
 
 ```js
   {
-    firstName: string, // user's first name
-    lastName: string, // user's last name
-    email: string, // user's email
-    password: string, // user's password
+    firstName: string,  // user's first name
+    lastName: string,   // user's last name
+    email: string,      // user's email
+    password: string,   // user's password
   }
 ```
 
@@ -70,11 +70,11 @@ Response object:
 
 ```js
   {
-    token: string, // JSON Web Token - required for all future requests
-    email: string, // user's email
-    firstName: string, // user's first name
-    lastName: string, // user's last name
-    avatarID: string, // user's avatar id
+    token: string,      // JSON Web Token - required for all future requests
+    email: string,      // user's email
+    firstName: string,  // user's first name
+    lastName: string,   // user's last name
+    avatarID: string,   // user's avatar id
   }
 ```
 
@@ -88,8 +88,8 @@ Request object:
 
 ```js
   {
-    email: string, // user's email
-    password: string, // user's password
+    email: string,      // user's email
+    password: string,   // user's password
   }
 ```
 
@@ -97,11 +97,11 @@ Response object:
 
 ```js
   {
-    token: string, // JSON Web Token - required for all future requests
-    email: string, // user's email
-    firstName: string, // user's first name
-    lastName: string, // user's last name
-    avatarID: string, // user's avatar id
+    token: string,      // JSON Web Token - required for all future requests
+    email: string,      // user's email
+    firstName: string,  // user's first name
+    lastName: string,   // user's last name
+    avatarID: string,   // user's avatar id
   }
 ```
 
@@ -117,7 +117,7 @@ Request object:
 
 ```js
 {
-  accessCode: string, // the instructor or student access code for the course
+  accessCode: string,   // the instructor or student access code for the course
 }
 ```
 
@@ -143,8 +143,8 @@ Request object:
 
 ```js
   {
-    name: string, // new course name
-    description: string, // new course description (optional)
+    name: string,         // new course name
+    description: string,  // new course description (optional)
   }
 ```
 
@@ -434,7 +434,7 @@ Request object:
   {
     postID: number,
     body: string,
-    parentID: number, // optional, if reply
+    parentID: number,   // optional, if reply
     anonymous: boolean, // optional
   }
 ```
@@ -469,7 +469,7 @@ Request body:
 
 ```js
   {
-    body: string, // optional
+    body: string,       // optional
     anonymous: boolean, // optional
   }
 ```
