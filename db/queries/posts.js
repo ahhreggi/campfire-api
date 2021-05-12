@@ -11,7 +11,7 @@ const db = require("../index");
  * @returns {Promise}                 A promise that resolves to the new post object.
  */
 const create = function (post) {
-  const { userID, courseID, title, body, anonymous = false } = post;
+  const { userID, courseID, title, body, tags = [], anonymous = false } = post;
   return db
     .query(
       `
@@ -21,7 +21,23 @@ const create = function (post) {
   `,
       [userID, courseID, title, body, anonymous]
     )
-    .then((res) => res.rows[0]);
+    .then((res) => res.rows[0])
+    .then((post) => {
+      const tagInserts = [];
+      for (tag of tags) {
+        tagInserts.push(
+          db.query(
+            `
+          INSERT INTO post_tags (tag_id, post_id)
+          VALUES ($1, $2)
+        `,
+            [tag, post.id]
+          )
+        );
+      }
+      return Promise.all([Promise.resolve(post), tagInserts]);
+    })
+    .then((res) => res[0]);
 };
 
 /**
@@ -167,6 +183,36 @@ const setBody = function (postID, body) {
 
 /**
  *
+ * @param {number} postID          The post ID.
+ * @param {Array<number>} tags     The array of tags to assign to the post.
+ * @returns {Promise}              A promise that resolves when the update is complete.
+ */
+const setTags = function (postID, tags) {
+  return db
+    .query(
+      `
+    DELETE FROM post_tags
+    WHERE post_id = $1;
+  `,
+      [postID]
+    )
+    .then(() => {
+      const tagInserts = [];
+      for (tag of tags) {
+        db.query(
+          `
+      INSERT INTO post_tags (tag_id, post_id)
+      VALUES ($2, $1)
+    `,
+          [postID, tag]
+        );
+      }
+      return Promise.all([tagInserts]);
+    });
+};
+
+/**
+ *
  * @param {number} postID    The post ID.
  * @param {number} answerID     The 'best answer' post ID.
  * @returns {Promise}        A promise that resolves to the updated post object.
@@ -234,6 +280,7 @@ module.exports = {
   author,
   setTitle,
   setBody,
+  setTags,
   setBestAnswer,
   setAnonymity,
   setPinned,

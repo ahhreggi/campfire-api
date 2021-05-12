@@ -7,7 +7,7 @@ const { roles } = require("../db/queries/users");
 // Create a new post
 router.post("/posts", (req, res, next) => {
   const { id: userID } = res.locals.decodedToken;
-  const { courseID, title, body, anonymous } = req.body;
+  const { courseID, title, body, tags, anonymous } = req.body;
 
   // Check fields
   if (!courseID || !title || !body) {
@@ -23,7 +23,7 @@ router.post("/posts", (req, res, next) => {
       });
     }
     // User does have permission - create post
-    Posts.create({ userID, courseID, title, body, anonymous })
+    Posts.create({ userID, courseID, title, body, tags, anonymous })
       .then((result) => res.send(result))
       .catch((e) => next(e));
   });
@@ -33,12 +33,13 @@ router.post("/posts", (req, res, next) => {
 router.patch("/posts/:id", (req, res, next) => {
   const { id: userID } = res.locals.decodedToken;
   const postID = req.params.id;
-  const { title, body, best_answer, anonymous, pinned } = req.body;
+  const { title, body, tags, best_answer, anonymous, pinned } = req.body;
 
   // Check we were given something to edit
   if (
     !title &&
     !body &&
+    !tags &&
     !best_answer &&
     anonymous === undefined &&
     pinned === undefined
@@ -46,7 +47,7 @@ router.patch("/posts/:id", (req, res, next) => {
     return next({
       status: 400,
       message:
-        "Must provide one of: title, body, best_answer, anonymous, pinned",
+        "Must provide one of: title, body, tags, best_answer, anonymous, pinned",
     });
   }
   // Check if user has edit permissions on the post
@@ -67,6 +68,10 @@ router.patch("/posts/:id", (req, res, next) => {
 
       if (body && body.length > 0) {
         queries.push(Posts.setBody(postID, body));
+      }
+
+      if (tags && tags.length > 0) {
+        queries.push(Posts.setTags(postID, tags));
       }
 
       if (parseInt(best_answer)) {
