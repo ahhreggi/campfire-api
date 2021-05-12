@@ -28,6 +28,19 @@ const deletePost = function (postId) {
     .then((res) => res.rows[0]);
 };
 
+const course = function (postID) {
+  return db
+    .query(
+      `
+    SELECT course_id
+    FROM posts
+    WHERE id = $1;
+  `,
+      [postID]
+    )
+    .then((res) => res.rows[0].course_id);
+};
+
 const getPostById = function (postId) {
   return db
     .query(
@@ -178,6 +191,7 @@ const setPinned = function (postId, pinned) {
 module.exports = {
   createPost,
   deletePost,
+  course,
   getPostById,
   getCourseRoleFromPostId,
   getPostersCourseRole,

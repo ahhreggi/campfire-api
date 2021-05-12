@@ -1,6 +1,6 @@
 const db = require("../index");
 
-const createComment = function (commentData) {
+const create = function (commentData) {
   const {
     postID,
     parentID = null,
@@ -20,7 +20,7 @@ const createComment = function (commentData) {
     .then((res) => res.rows[0]);
 };
 
-const commentIsReply = function (commentId) {
+const isReply = function (commentId) {
   return db
     .query(
       `
@@ -31,6 +31,58 @@ const commentIsReply = function (commentId) {
       [commentId]
     )
     .then((res) => Boolean(res.rows[0].parent_id));
+};
+
+// Returns the id of the course where the comment was made
+const course = function (commentID) {
+  return db
+    .query(
+      `
+    SELECT course_id as id
+    FROM comments
+    JOIN posts ON post_id = posts.id
+    WHERE comments.id = $1;
+  `,
+      [commentID]
+    )
+    .then((res) => res.rows[0].id);
+};
+
+const role = function (commentID) {
+  return db
+    .query(
+      `
+    WITH user_id AS (
+      SELECT user_id FROM comments WHERE id = $1
+    )
+    SELECT 
+      CASE WHEN (SELECT is_admin FROM users WHERE id = (SELECT * FROM user_id)) = TRUE THEN 'admin'
+      ELSE (
+        SELECT role
+        FROM enrolments
+        JOIN posts ON posts.course_id = enrolments.course_id
+        JOIN comments ON comments.post_id = posts.id
+        WHERE comments.id = $1
+        AND enrolments.user_id = comments.user_id
+      )
+    END AS role
+  `,
+      [commentID]
+    )
+    .then((res) => res.rows[0].role);
+};
+
+const author = function (commentID) {
+  return db
+    .query(
+      `
+    SELECT user_id
+    FROM comments
+    WHERE id = $1
+  `,
+      [commentID]
+    )
+    .then((res) => res.rows[0].user_id);
 };
 
 const getCourseRoleFromCommentId = function (commentId, userId) {
@@ -70,46 +122,6 @@ const getCourseRoleFromCommentId = function (commentId, userId) {
     .then((res) => res.rows[0].role);
 };
 
-const getCommentorsCourseRole = function (commentId) {
-  return db
-    .query(
-      `
-    SELECT comments.user_id, course_id
-    FROM comments
-    JOIN posts ON posts.id = post_id
-    WHERE comments.id = $1;
-  `,
-      [commentId]
-    )
-    .then((res) => res.rows[0])
-    .then((res) =>
-      db.query(
-        `
-    SELECT 
-    CASE 
-      WHEN (SELECT is_admin FROM users WHERE id = $1) = TRUE THEN 'admin'
-      ELSE (SELECT role FROM enrolments WHERE user_id = $1 AND course_id = $2) 
-    END AS role
-  `,
-        [res.user_id, res.course_id]
-      )
-    )
-    .then((res) => res.rows[0].role);
-};
-
-const getCommentorId = function (commentId) {
-  return db
-    .query(
-      `
-    SELECT user_id
-    FROM comments
-    WHERE id = $1;
-  `,
-      [commentId]
-    )
-    .then((res) => res.rows[0].user_id);
-};
-
 const setBody = function (commentId, body) {
   return db
     .query(
@@ -136,7 +148,7 @@ const setAnonymity = function (commentId, anonymous) {
   );
 };
 
-const getCommentById = function (commentId) {
+const getByID = function (commentId) {
   return db
     .query(
       `
@@ -149,7 +161,7 @@ const getCommentById = function (commentId) {
     .then((res) => res.rows[0]);
 };
 
-const deleteComment = function (commentId) {
+const remove = function (commentId) {
   return db
     .query(
       `
@@ -163,7 +175,7 @@ const deleteComment = function (commentId) {
     .then((res) => res.rows[0]);
 };
 
-const likeComment = function (commentId, userId) {
+const like = function (commentID, userID) {
   return db
     .query(
       `
@@ -171,12 +183,12 @@ const likeComment = function (commentId, userId) {
     VALUES ($1, $2)
     RETURNING *;
   `,
-      [userId, commentId]
+      [userID, commentID]
     )
     .then((res) => res.rows[0]);
 };
 
-const unlikeComment = function (commentId, userId) {
+const unlike = function (commentId, userId) {
   return db
     .query(
       `
@@ -190,12 +202,13 @@ const unlikeComment = function (commentId, userId) {
     .then((res) => res.rows[0]);
 };
 
-const getCommentsForPost = function (postId) {
+const forPost = function (postId) {
   return db
     .query(
       `
     SELECT * FROM comments
-    WHERE post_id = $1;
+    WHERE post_id = $1
+    AND active = TRUE;
   `,
       [postId]
     )
@@ -203,16 +216,17 @@ const getCommentsForPost = function (postId) {
 };
 
 module.exports = {
-  createComment,
+  create: create,
   getCourseRoleFromCommentId,
-  getCommentorsCourseRole,
-  getCommentorId,
-  commentIsReply,
+  course,
+  role,
+  author,
+  isReply,
   setBody,
   setAnonymity,
-  getCommentById,
-  deleteComment,
-  likeComment,
-  unlikeComment,
-  getCommentsForPost,
+  getByID,
+  remove,
+  like,
+  unlike,
+  forPost,
 };

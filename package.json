@@ -7,6 +7,7 @@
     "start": "node index",
     "test": "jest",
     "local": "./node_modules/.bin/nodemon",
+    "trace": "node --trace-warnings index",
     "test:server": "NODE_ENV=test npm start"
   },
   "repository": {

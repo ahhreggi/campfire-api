@@ -1,5 +1,19 @@
 const db = require("../index");
-const { editable } = require("../../helpers/permissionsHelpers");
+const editable = require("../../helpers/editable");
+
+const role = function (courseID, userID) {
+  return db
+    .query(
+      `
+    SELECT 
+      CASE WHEN (SELECT is_admin FROM users WHERE id = $2) = TRUE THEN 'admin'
+      ELSE (SELECT role FROM enrolments WHERE user_id = $2 AND course_id = $1)
+    END AS role
+  `,
+      [courseID, userID]
+    )
+    .then((res) => res.rows[0].role);
+};
 
 const getCoursesForUser = function (userId) {
   return db
@@ -379,6 +393,7 @@ const endorsable = function (role) {
 const pinnable = endorsable;
 
 module.exports = {
+  role,
   getCoursesForUser,
   getCourseById,
   getCourseRole,

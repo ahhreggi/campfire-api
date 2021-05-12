@@ -342,6 +342,7 @@ Request object:
     courseID: number, // course id to post in
     title: string,
     body: string,
+    // TODO tags: [id],
     anonymous: boolean, // optional: default false
   }
 ```
@@ -361,7 +362,7 @@ Return object is the newly created post object:
   body: string,
   created_at: timestamp,
   last_modified: timestamp,
-  best_answer: number, // nullable
+  best_answer: number,    // nullable
   anonymous: boolean,
   active: boolean,
 }
@@ -377,11 +378,12 @@ Request object:
 
 ```js
   {
-    title: string, // optional - will update last_modified
-    body: string, // optional - will update last_modified
-    best_answer: number, // optional
-    anonymous: boolean, // optional
-    pinned: boolean, // optional
+    title: string,        // optional - will update last_modified
+    body: string,         // optional - will update last_modified
+    //TODO tags: [id],           // optional
+    anonymous: boolean,   // optional
+    best_answer: number,  // optional
+    pinned: boolean,      // optional
   }
 ```
 

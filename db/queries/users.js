@@ -1,5 +1,12 @@
 const db = require("../index");
 
+const roles = {
+  ADMIN: "admin",
+  OWNER: "owner",
+  INSTRUCTOR: "instructor",
+  STUDENT: "student",
+};
+
 /**
  *
  * @param {Object} user - The user object to save.
@@ -54,4 +61,4 @@ const userIsAdmin = function (userId) {
     .then((res) => res.rows[0].is_admin);
 };
 
-module.exports = { createUser, getUserByEmail, userIsAdmin };
+module.exports = { createUser, getUserByEmail, userIsAdmin, roles };

@@ -1,27 +1,18 @@
-// Determines if a given user has edit permissions on a given post
-const editable = function (role, posterRole, userId, posterId) {
-  const ADMIN = "admin";
-  const OWNER = "owner";
-  const INSTRUCTOR = "instructor";
-  const STUDENT = "student";
+const Comments = require("../db/queries/comments");
+const Courses = require("../db/queries/courses");
+const editable = require("./editable");
 
-  // admins can edit any post
-  if (role === ADMIN) return true;
-  // owner can edit posts from lower permissioned users
-  if (role === OWNER && posterRole !== ADMIN && posterRole !== OWNER)
-    return true;
-  // instructors can edit posts from lower permissioned users
-  if (
-    role === INSTRUCTOR &&
-    posterRole !== ADMIN &&
-    posterRole !== OWNER &&
-    posterRole !== INSTRUCTOR
-  )
-    return true;
-  // users can edit their own posts
-  if (posterId === userId) return true;
-  // otherwise, no
-  return false;
+const canEditComment = function (userID, commentID) {
+  const pRole = Comments.course(commentID).then((courseID) =>
+    Courses.role(courseID, userID)
+  );
+  const pCommentorRole = Comments.role(commentID);
+  const pCommentorID = Comments.author(commentID);
+
+  return Promise.all([pRole, pCommentorRole, pCommentorID]).then((result) => {
+    const [userRole, commentorRole, commentorID] = result;
+    return editable(userRole, commentorRole, userID, commentorID);
+  });
 };
 
-module.exports = { editable };
+module.exports = { canEditComment };
