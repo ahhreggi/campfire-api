@@ -58,7 +58,14 @@ const course = function (commentID) {
   `,
       [commentID]
     )
-    .then((res) => res.rows[0].id);
+    .then((res) => {
+      if (!res.rows[0])
+        return Promise.reject({
+          status: 404,
+          message: `Comment ${commentID} doesn't exist`,
+        });
+      return res.rows[0].id;
+    });
 };
 
 /**
