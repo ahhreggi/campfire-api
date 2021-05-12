@@ -335,6 +335,7 @@ const byId = function (courseID, userID) {
         tags: courseTags.rows,
         posts: coursePosts.rows.map((post) => ({
           ...post,
+          views: parseInt(post.views),
           editable: editable(role, post.role, userID, post.user_id),
           pinnable: pinnable(role),
           tags: coursePostTags.rows
