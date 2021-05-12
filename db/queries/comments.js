@@ -216,7 +216,7 @@ const forPost = function (postId) {
 };
 
 module.exports = {
-  create: create,
+  create,
   getCourseRoleFromCommentId,
   course,
   role,

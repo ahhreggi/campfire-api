@@ -1,20 +1,20 @@
 const db = require("../index");
 
-const createPost = function (post) {
-  const { userId, courseId, title, body, anonymous = false } = post;
+const create = function (post) {
+  const { userID, courseID, title, body, anonymous = false } = post;
   return db
     .query(
       `
-    INSERT INTO posts (user_id, course_id, title, body, anonymous)
-    VALUES ($1, $2, $3, $4, $5)
-    RETURNING *;
+      INSERT INTO posts (user_id, course_id, title, body, anonymous)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING *;
   `,
-      [userId, courseId, title, body, anonymous]
+      [userID, courseID, title, body, anonymous]
     )
     .then((res) => res.rows[0]);
 };
 
-const deletePost = function (postId) {
+const remove = function (postId) {
   return db
     .query(
       `
@@ -41,7 +41,7 @@ const course = function (postID) {
     .then((res) => res.rows[0].course_id);
 };
 
-const getPostById = function (postId) {
+const getByID = function (postID) {
   return db
     .query(
       `
@@ -49,7 +49,7 @@ const getPostById = function (postId) {
     FROM posts
     WHERE id = $1;  
 `,
-      [postId]
+      [postID]
     )
     .then((res) => res.rows[0]);
 };
@@ -80,32 +80,30 @@ const getCourseRoleFromPostId = function (postId, userId) {
     .then((res) => res.rows[0].role);
 };
 
-const getPostersCourseRole = function (postId) {
+const role = function (postID) {
   return db
     .query(
       `
-    SELECT user_id, course_id
-    FROM posts
-    WHERE id = $1;
-  `,
-      [postId]
-    )
-    .then((res) =>
-      db.query(
-        `
-    SELECT 
-    CASE 
-      WHEN (SELECT is_admin FROM users WHERE id = $1) = TRUE THEN 'admin'
-      ELSE (SELECT role FROM enrolments WHERE user_id = $1 AND course_id = $2) 
-    END AS role
-  `,
-        [res.rows[0].user_id, res.rows[0].course_id]
+      WITH user_id AS (
+        SELECT user_id FROM posts WHERE id = $1
       )
+      SELECT 
+        CASE WHEN (SELECT is_admin FROM users WHERE id = (SELECT * FROM user_id)) = TRUE THEN 'admin'
+        ELSE (
+          SELECT role
+          FROM enrolments
+          JOIN posts ON posts.course_id = enrolments.course_id
+          WHERE posts.id = $1
+          AND enrolments.user_id = posts.user_id
+        )
+      END AS role
+    `,
+      [postID]
     )
     .then((res) => res.rows[0].role);
 };
 
-const getPosterId = function (postId) {
+const author = function (postID) {
   return db
     .query(
       `
@@ -113,7 +111,7 @@ const getPosterId = function (postId) {
     FROM posts
     WHERE id = $1;
   `,
-      [postId]
+      [postID]
     )
     .then((res) => res.rows[0].user_id);
 };
@@ -189,13 +187,13 @@ const setPinned = function (postId, pinned) {
 };
 
 module.exports = {
-  createPost,
-  deletePost,
+  create,
+  remove,
   course,
-  getPostById,
+  getByID,
   getCourseRoleFromPostId,
-  getPostersCourseRole,
-  getPosterId,
+  role,
+  author,
   setTitle,
   setBody,
   setBestAnswer,

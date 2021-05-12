@@ -69,8 +69,8 @@ INSERT INTO tags (course_id, name) VALUES
 INSERT INTO posts (user_id, course_id, title, body) VALUES
 (9, 1, 'How do I use promises?', 'I am using a new library that returns a Promise instead of a callback... how do I act on it once its done?'),
 (10, 1, 'How do I create a class?', 'How do I write a new class in javascript, and declare methods, variables, etc?'),
-(7, 2, 'How do I write a function in Ruby?', 'I am used to JS syntax, how do I write a ruby function?'),
-(8, 2, 'What is a block and how does it work?', 'I see the array each method can take in a block, what is that?');
+(13, 2, 'How do I write a function in Ruby?', 'I am used to JS syntax, how do I write a ruby function?'),
+(14, 2, 'What is a block and how does it work?', 'I see the array each method can take in a block, what is that?');
 
 
 INSERT INTO post_tags (tag_id, post_id) VALUES

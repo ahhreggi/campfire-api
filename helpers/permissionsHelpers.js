@@ -1,5 +1,6 @@
 const Comments = require("../db/queries/comments");
 const Courses = require("../db/queries/courses");
+const Posts = require("../db/queries/posts");
 const editable = require("./editable");
 
 const canEditComment = function (userID, commentID) {
@@ -15,4 +16,17 @@ const canEditComment = function (userID, commentID) {
   });
 };
 
-module.exports = { canEditComment };
+const canEditPost = function (userID, postID) {
+  const pRole = Posts.course(postID).then((courseID) =>
+    Courses.role(courseID, userID)
+  );
+  const pPosterRole = Posts.role(postID);
+  const pPosterID = Posts.author(postID);
+
+  return Promise.all([pRole, pPosterRole, pPosterID]).then((result) => {
+    const [userRole, posterRole, posterID] = result;
+    return editable(userRole, posterRole, userID, posterID);
+  });
+};
+
+module.exports = { canEditComment, canEditPost };

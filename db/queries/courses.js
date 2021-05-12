@@ -15,7 +15,7 @@ const role = function (courseID, userID) {
     .then((res) => res.rows[0].role);
 };
 
-const getCoursesForUser = function (userId) {
+const forUser = function (userId) {
   return db
     .query(
       `
@@ -394,7 +394,7 @@ const pinnable = endorsable;
 
 module.exports = {
   role,
-  getCoursesForUser,
+  forUser,
   getCourseById,
   getCourseRole,
   getCourseByAccessCode,
