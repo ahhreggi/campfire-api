@@ -390,6 +390,7 @@ Request object:
 Requirements:
 
 1. user has edit access on the post
+2. for setting best_answer, user must be post author
 
 Response object is the updated post:
 
