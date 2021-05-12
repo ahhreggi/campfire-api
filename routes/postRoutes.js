@@ -42,6 +42,7 @@ router.patch("/posts/:id", (req, res, next) => {
     !body &&
     !tags &&
     !best_answer &&
+    best_answer !== null &&
     anonymous === undefined &&
     pinned === undefined
   ) {
@@ -75,7 +76,7 @@ router.patch("/posts/:id", (req, res, next) => {
         queries.push(Posts.setTags(postID, tags));
       }
 
-      if (parseInt(best_answer)) {
+      if (parseInt(best_answer) || best_answer === null) {
         queries.push(
           // Only allow author to select best answer
           Posts.author(postID)
@@ -85,30 +86,33 @@ router.patch("/posts/:id", (req, res, next) => {
                   status: 401,
                   message: "Only the post author can select a best answer",
                 });
-              // Check comment exists
-              return Comments.getByID(best_answer);
+              // If given a comment ID -> check comment exists
+              if (best_answer !== null) {
+                return Comments.getByID(best_answer)
+                  .then((comment) => {
+                    if (!comment)
+                      return Promise.reject({
+                        status: 400,
+                        message: `Can't make comment ${best_answer} the best answer: it doesn't exist`,
+                      });
+                    // Check comment was made on this post
+                    return Comments.forPost(postID);
+                  })
+                  .then((comments) => {
+                    if (
+                      comments.filter((comment) => comment.id === best_answer)
+                        .length < 1
+                    ) {
+                      return Promise.reject({
+                        status: 400,
+                        message: `Can't make comment ${best_answer} the best answer: it isn't part of this post`,
+                      });
+                    }
+                  });
+              }
             })
-            .then((comment) => {
-              if (!comment)
-                return Promise.reject({
-                  status: 400,
-                  message: `Can't make comment ${best_answer} the best answer: it doesn't exist`,
-                });
-              // Check comment was made on this post
-              return Comments.forPost(postID);
-            })
-            .then((comments) => {
-              if (
-                comments.filter((comment) => comment.id === best_answer)
-                  .length < 1
-              )
-                return Promise.reject({
-                  status: 400,
-                  message: `Can't make comment ${best_answer} the best answer: it isn't part of this post`,
-                });
-              // All checks passed - set best answer
-              return Posts.setBestAnswer(postID, best_answer);
-            })
+            // All checks passed - set best answer
+            .then(() => Posts.setBestAnswer(postID, best_answer))
         );
       }
 
