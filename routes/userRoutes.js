@@ -65,7 +65,10 @@ router.post("/login", (req, res, next) => {
   Users.byEmail(email)
     .then((user) => {
       if (!user) {
-        return next({ status: 400, message: "No user exists with this email" });
+        return Promise.reject({
+          status: 400,
+          message: "No user exists with this email",
+        });
       }
       // User exists - check password
       return Promise.all([
