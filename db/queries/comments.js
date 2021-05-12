@@ -39,7 +39,14 @@ const isReply = function (commentID) {
   `,
       [commentID]
     )
-    .then((res) => Boolean(res.rows[0].parent_id));
+    .then((res) => {
+      if (!res.rows[0])
+        return Promise.reject({
+          status: 404,
+          message: `Comment ${commentID} doesn't exist`,
+        });
+      return Boolean(res.rows[0].parent_id);
+    });
 };
 
 /**
