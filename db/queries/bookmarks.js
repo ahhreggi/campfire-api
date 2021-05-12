@@ -1,6 +1,6 @@
 const db = require("../index");
 
-const addBookmark = function (userId, postId) {
+const create = function (userId, postId) {
   return db
     .query(
       `
@@ -13,7 +13,7 @@ const addBookmark = function (userId, postId) {
     .then((res) => res.rows[0]);
 };
 
-const deleteBookmark = function (userId, postId) {
+const remove = function (userID, postID) {
   return db
     .query(
       `
@@ -22,9 +22,9 @@ const deleteBookmark = function (userId, postId) {
     AND post_id = $2
     RETURNING *;
   `,
-      [userId, postId]
+      [userID, postID]
     )
     .then((res) => res.rows[0]);
 };
 
-module.exports = { addBookmark, deleteBookmark };
+module.exports = { create, remove };
