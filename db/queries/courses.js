@@ -1,6 +1,12 @@
 const db = require("../index");
 const editable = require("../../helpers/editable");
 
+/**
+ *
+ * @param {number} courseID - The course ID.
+ * @param {number} userID - The user's ID.
+ * @returns {Promise} A promise that resolves to the user's role in the given course.
+ */
 const role = function (courseID, userID) {
   return db
     .query(
@@ -15,6 +21,11 @@ const role = function (courseID, userID) {
     .then((res) => res.rows[0].role);
 };
 
+/**
+ *
+ * @param {number} userID - The user's ID.
+ * @returns {Promise} A promise that resolves to the list of courses the user has access to.
+ */
 const forUser = function (userID) {
   return db
     .query(
@@ -53,6 +64,11 @@ const forUser = function (userID) {
     });
 };
 
+/**
+ *
+ * @param {number} accessCode - The course access code.
+ * @returns {Promise} A promise that resolves to the course for the given access code.
+ */
 const byAccessCode = function (accessCode) {
   return db
     .query(
@@ -67,6 +83,13 @@ const byAccessCode = function (accessCode) {
     .then((res) => res.rows[0]);
 };
 
+/**
+ *
+ * @param {number} userID - The user's ID.
+ * @param {number} courseID - The course ID.
+ * @param {string} role - The role to assign the user.
+ * @returns {Promise} A promise that resolves to the user enrolment object.
+ */
 const enrol = function (userID, courseID, role) {
   return db
     .query(
@@ -80,6 +103,15 @@ const enrol = function (userID, courseID, role) {
     .then((res) => res.rows[0]);
 };
 
+/**
+ *
+ * @param {Object} courseData - The course data.
+ * @param {string} courseData.name - The course name.
+ * @param {string} courseData.description - The course description.
+ * @param {string} courseData.studentAccessCode - The course's student access code.
+ * @param {string} courseData.instructorAccessCode - The course's instructor access code.
+ * @returns {Promise} A promise that resolves to the new course object.
+ */
 const create = function (courseData) {
   const { name, description, studentAccessCode, instructorAccessCode } =
     courseData;
@@ -95,6 +127,12 @@ const create = function (courseData) {
     .then((res) => res.rows[0]);
 };
 
+/**
+ *
+ * @param {number} courseID - The course ID.
+ * @param {number} userID - The user's ID.
+ * @returns {Promise} A promise that resolves to the full course object.
+ */
 const byId = function (courseID, userID) {
   const courseDataPromise = db.query(
     `

@@ -1,6 +1,12 @@
 const db = require("../index");
 
-const create = function (userId, postId) {
+/**
+ *
+ * @param {number} userID - The user's ID.
+ * @param {number} postID - The post ID to bookmark.
+ * @returns {Promise} A promise that resolves to the new bookmark object.
+ */
+const create = function (userID, postID) {
   return db
     .query(
       `
@@ -8,11 +14,17 @@ const create = function (userId, postId) {
     VALUES ($1, $2)
     RETURNING *;
   `,
-      [userId, postId]
+      [userID, postID]
     )
     .then((res) => res.rows[0]);
 };
 
+/**
+ *
+ * @param {Object} userID - The user's ID.
+ * @param {Object} postID - The post ID.
+ * @returns {Promise} A promise that resolves to the removed bookmark object.
+ */
 const remove = function (userID, postID) {
   return db
     .query(

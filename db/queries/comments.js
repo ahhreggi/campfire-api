@@ -1,13 +1,17 @@
 const db = require("../index");
 
-const create = function (commentData) {
-  const {
-    postID,
-    parentID = null,
-    userId,
-    body,
-    anonymous = false,
-  } = commentData;
+/**
+ *
+ * @param {Object} comment              The comment data.
+ * @param {string} comment.postID       The post_id where the comment is being posted.
+ * @param {string} comment.parentID     The comment_id of the parent comment (if a reply).
+ * @param {string} comment.userID       The user_id of the comment author.
+ * @param {string} comment.body         The comment body.
+ * @param {string} comment.anonymous    The comment's anonymity status.
+ * @returns {Promise}                   A promise that resolves to the new comment object.
+ */
+const create = function (comment) {
+  const { postID, parentID = null, userID, body, anonymous = false } = comment;
   return db
     .query(
       `
@@ -15,12 +19,17 @@ const create = function (commentData) {
     VALUES ($1, $2, $3, $4, $5)
     RETURNING *;
   `,
-      [postID, parentID, userId, body, anonymous]
+      [postID, parentID, userID, body, anonymous]
     )
     .then((res) => res.rows[0]);
 };
 
-const isReply = function (commentId) {
+/**
+ *
+ * @param {number} commentID     The comment ID.
+ * @returns {Promise}            A promise that resolves to true if the comment is a reply.
+ */
+const isReply = function (commentID) {
   return db
     .query(
       `
@@ -28,12 +37,16 @@ const isReply = function (commentId) {
     FROM comments
     WHERE id = $1;
   `,
-      [commentId]
+      [commentID]
     )
     .then((res) => Boolean(res.rows[0].parent_id));
 };
 
-// Returns the id of the course where the comment was made
+/**
+ *
+ * @param {number} commentID     The comment ID.
+ * @returns {Promise}            A promise that resolves to the course_id where the comment was posted.
+ */
 const course = function (commentID) {
   return db
     .query(
@@ -48,6 +61,11 @@ const course = function (commentID) {
     .then((res) => res.rows[0].id);
 };
 
+/**
+ *
+ * @param {number} commentID     The comment ID.
+ * @returns {Promise}            A promise that resolves to the role of the comment author.
+ */
 const role = function (commentID) {
   return db
     .query(
@@ -72,6 +90,11 @@ const role = function (commentID) {
     .then((res) => res.rows[0].role);
 };
 
+/**
+ *
+ * @param {number} commentID     The comment ID.
+ * @returns {Promise}            A promise that resolves to the user_id of the comment author.
+ */
 const author = function (commentID) {
   return db
     .query(
@@ -85,44 +108,13 @@ const author = function (commentID) {
     .then((res) => res.rows[0].user_id);
 };
 
-const getCourseRoleFromCommentId = function (commentId, userId) {
-  return db
-    .query(
-      `
-    SELECT post_id
-    FROM comments
-    WHERE id = $1
-  `,
-      [commentId]
-    )
-    .then((res) => res.rows[0].post_id)
-    .then((postId) =>
-      db.query(
-        `
-    SELECT course_id 
-    FROM posts
-    WHERE id = $1;
-  `,
-        [postId]
-      )
-    )
-    .then((res) => res.rows[0].course_id)
-    .then((courseId) =>
-      db.query(
-        `
-      SELECT 
-      CASE 
-        WHEN (SELECT is_admin FROM users WHERE id = $1) = TRUE THEN 'admin'
-        ELSE (SELECT role FROM enrolments WHERE user_id = $1 AND course_id = $2) 
-      END AS role
-  `,
-        [userId, courseId]
-      )
-    )
-    .then((res) => res.rows[0].role);
-};
-
-const setBody = function (commentId, body) {
+/**
+ *
+ * @param {number} commentID     The comment ID.
+ * @param {string} body          The comment body.
+ * @returns {Promise}            A promise that resolves to the updated comment.
+ */
+const setBody = function (commentID, body) {
   return db
     .query(
       `
@@ -131,12 +123,18 @@ const setBody = function (commentId, body) {
     WHERE id = $1
     RETURNING *;
   `,
-      [commentId, body]
+      [commentID, body]
     )
     .then((res) => res.rows[0]);
 };
 
-const setAnonymity = function (commentId, anonymous) {
+/**
+ *
+ * @param {number} commentID     The comment ID.
+ * @param {boolean} anonymous    The comment's anonymity status.
+ * @returns {Promise}            A promise that resolves to the updated comment.
+ */
+const setAnonymity = function (commentID, anonymous) {
   return db.query(
     `
     UPDATE comments
@@ -144,11 +142,16 @@ const setAnonymity = function (commentId, anonymous) {
     WHERE id = $1
     RETURNING *;
   `,
-    [commentId, anonymous]
+    [commentID, anonymous]
   );
 };
 
-const getByID = function (commentId) {
+/**
+ *
+ * @param {number} commentID     The comment ID.
+ * @returns {Promise}            A promise that resolves to the comment object.
+ */
+const getByID = function (commentID) {
   return db
     .query(
       `
@@ -156,12 +159,17 @@ const getByID = function (commentId) {
     FROM comments
     WHERE id = $1;
   `,
-      [commentId]
+      [commentID]
     )
     .then((res) => res.rows[0]);
 };
 
-const remove = function (commentId) {
+/**
+ *
+ * @param {number} commentID     The comment ID.
+ * @returns {Promise}            A promise that resolves to the removed comment.
+ */
+const remove = function (commentID) {
   return db
     .query(
       `
@@ -170,11 +178,17 @@ const remove = function (commentId) {
       WHERE id = $1
       RETURNING *;
     `,
-      [commentId]
+      [commentID]
     )
     .then((res) => res.rows[0]);
 };
 
+/**
+ *
+ * @param {number} commentID  The comment ID.
+ * @param {number} userID     The user's ID.
+ * @returns {Promise}         A promise that resolves to the new comment_like object.
+ */
 const like = function (commentID, userID) {
   return db
     .query(
@@ -188,7 +202,13 @@ const like = function (commentID, userID) {
     .then((res) => res.rows[0]);
 };
 
-const unlike = function (commentId, userId) {
+/**
+ *
+ * @param {number} commentID  The comment ID.
+ * @param {number} userID     The user's ID.
+ * @returns {Promise}         A promise that resolves to the deleted comment_like object.
+ */
+const unlike = function (commentID, userID) {
   return db
     .query(
       `
@@ -197,12 +217,17 @@ const unlike = function (commentId, userId) {
     AND comment_id = $2
     RETURNING *;
     `,
-      [userId, commentId]
+      [userID, commentID]
     )
     .then((res) => res.rows[0]);
 };
 
-const forPost = function (postId) {
+/**
+ *
+ * @param {number} postID     The post's ID.
+ * @returns {Promise}         A promise that resolves to the array of comments for the post.
+ */
+const forPost = function (postID) {
   return db
     .query(
       `
@@ -210,14 +235,13 @@ const forPost = function (postId) {
     WHERE post_id = $1
     AND active = TRUE;
   `,
-      [postId]
+      [postID]
     )
     .then((res) => res.rows);
 };
 
 module.exports = {
   create,
-  getCourseRoleFromCommentId,
   course,
   role,
   author,

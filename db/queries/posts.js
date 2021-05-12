@@ -1,5 +1,15 @@
 const db = require("../index");
 
+/**
+ *
+ * @param {Object} post               The post data.
+ * @param {number} post.userID        The user's ID.
+ * @param {number} post.courseID      The course ID.
+ * @param {string} post.title         The post title.
+ * @param {string} post.body          The post body.
+ * @param {boolean} post.anonymous    If the post should be anonymous.
+ * @returns {Promise}                 A promise that resolves to the new post object.
+ */
 const create = function (post) {
   const { userID, courseID, title, body, anonymous = false } = post;
   return db
@@ -14,7 +24,12 @@ const create = function (post) {
     .then((res) => res.rows[0]);
 };
 
-const remove = function (postId) {
+/**
+ *
+ * @param {number} postID    The post ID.
+ * @returns {Promise}        A promise that resolves to the removed post object.
+ */
+const remove = function (postID) {
   return db
     .query(
       `
@@ -23,11 +38,16 @@ const remove = function (postId) {
     WHERE id = $1
     RETURNING *;
   `,
-      [postId]
+      [postID]
     )
     .then((res) => res.rows[0]);
 };
 
+/**
+ *
+ * @param {number} postID    The post ID.
+ * @returns {Promise}        A promise that resolves to the posts course_id.
+ */
 const course = function (postID) {
   return db
     .query(
@@ -41,6 +61,11 @@ const course = function (postID) {
     .then((res) => res.rows[0].course_id);
 };
 
+/**
+ *
+ * @param {number} postID    The post ID.
+ * @returns {Promise}        A promise that resolves to the post object.
+ */
 const getByID = function (postID) {
   return db
     .query(
@@ -54,32 +79,11 @@ const getByID = function (postID) {
     .then((res) => res.rows[0]);
 };
 
-const getCourseRoleFromPostId = function (postId, userId) {
-  return db
-    .query(
-      `
-    SELECT course_id 
-    FROM posts
-    WHERE id = $1;
-  `,
-      [postId]
-    )
-    .then((res) => res.rows[0].course_id)
-    .then((courseId) =>
-      db.query(
-        `
-      SELECT 
-      CASE 
-        WHEN (SELECT is_admin FROM users WHERE id = $1) = TRUE THEN 'admin'
-        ELSE (SELECT role FROM enrolments WHERE user_id = $1 AND course_id = $2) 
-      END AS role
-  `,
-        [userId, courseId]
-      )
-    )
-    .then((res) => res.rows[0].role);
-};
-
+/**
+ *
+ * @param {number} postID    The post ID.
+ * @returns {Promise}        A promise that resolves to the post author's role.
+ */
 const role = function (postID) {
   return db
     .query(
@@ -103,6 +107,11 @@ const role = function (postID) {
     .then((res) => res.rows[0].role);
 };
 
+/**
+ *
+ * @param {number} postID    The post ID.
+ * @returns {Promise}        A promise that resolves to the post author's user_id.
+ */
 const author = function (postID) {
   return db
     .query(
@@ -116,7 +125,13 @@ const author = function (postID) {
     .then((res) => res.rows[0].user_id);
 };
 
-const setTitle = function (postId, title) {
+/**
+ *
+ * @param {number} postID    The post ID.
+ * @param {string} title     The post title.
+ * @returns {Promise}        A promise that resolves to the updated post object.
+ */
+const setTitle = function (postID, title) {
   return db
     .query(
       `
@@ -125,12 +140,18 @@ const setTitle = function (postId, title) {
     WHERE id = $1
     RETURNING *;
   `,
-      [postId, title]
+      [postID, title]
     )
     .then((res) => res.rows[0]);
 };
 
-const setBody = function (postId, body) {
+/**
+ *
+ * @param {number} postID    The post ID.
+ * @param {string} body     The post body.
+ * @returns {Promise}        A promise that resolves to the updated post object.
+ */
+const setBody = function (postID, body) {
   return db
     .query(
       `
@@ -139,12 +160,18 @@ const setBody = function (postId, body) {
     WHERE id = $1
     RETURNING *;
   `,
-      [postId, body]
+      [postID, body]
     )
     .then((res) => res.rows[0]);
 };
 
-const setBestAnswer = function (postId, answerId) {
+/**
+ *
+ * @param {number} postID    The post ID.
+ * @param {number} answerID     The 'best answer' post ID.
+ * @returns {Promise}        A promise that resolves to the updated post object.
+ */
+const setBestAnswer = function (postID, answerID) {
   return db
     .query(
       `
@@ -153,12 +180,18 @@ const setBestAnswer = function (postId, answerId) {
     WHERE id = $1
     RETURNING *;
   `,
-      [postId, answerId]
+      [postID, answerID]
     )
     .then((res) => res.rows[0]);
 };
 
-const setAnonymity = function (postId, anonymous) {
+/**
+ *
+ * @param {number} postID       The post ID.
+ * @param {boolean} anonymous   The post's anonymity status.
+ * @returns {Promise}           A promise that resolves to the updated post object.
+ */
+const setAnonymity = function (postID, anonymous) {
   return db
     .query(
       `
@@ -167,12 +200,18 @@ const setAnonymity = function (postId, anonymous) {
     WHERE id = $1
     RETURNING *;
   `,
-      [postId, anonymous]
+      [postID, anonymous]
     )
     .then((res) => res.rows[0]);
 };
 
-const setPinned = function (postId, pinned) {
+/**
+ *
+ * @param {number} postID    The post ID.
+ * @param {boolean} pinned   The post's pinned status.
+ * @returns {Promise}        A promise that resolves to the updated post object.
+ */
+const setPinned = function (postID, pinned) {
   return db
     .query(
       `
@@ -181,7 +220,7 @@ const setPinned = function (postId, pinned) {
     WHERE id = $1
     RETURNING *;
   `,
-      [postId, pinned]
+      [postID, pinned]
     )
     .then((res) => res.rows[0]);
 };
@@ -191,7 +230,6 @@ module.exports = {
   remove,
   course,
   getByID,
-  getCourseRoleFromPostId,
   role,
   author,
   setTitle,

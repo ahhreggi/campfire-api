@@ -51,9 +51,7 @@ router.post("/comments", (req, res, next) => {
         );
       }
     })
-    .then(() =>
-      Comments.create({ postID, parentID, userId: userID, body, anonymous })
-    )
+    .then(() => Comments.create({ postID, parentID, userID, body, anonymous }))
     .then((result) => res.send(result))
     .catch((err) => next(err));
 });
