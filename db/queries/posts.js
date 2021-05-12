@@ -74,7 +74,10 @@ const course = function (postID) {
   `,
       [postID]
     )
-    .then((res) => res.rows[0].course_id);
+    .then((res) => {
+      if (!res.rows[0]) return invalidPostID(postID);
+      return res.rows[0].course_id;
+    });
 };
 
 /**
@@ -120,7 +123,10 @@ const role = function (postID) {
     `,
       [postID]
     )
-    .then((res) => res.rows[0].role);
+    .then((res) => {
+      if (!res.rows[0]) return invalidPostID(postID);
+      return res.rows[0].role;
+    });
 };
 
 /**
@@ -138,7 +144,10 @@ const author = function (postID) {
   `,
       [postID]
     )
-    .then((res) => res.rows[0].user_id);
+    .then((res) => {
+      if (!res.rows[0]) return invalidPostID(postID);
+      return res.rows[0].user_id;
+    });
 };
 
 /**
@@ -269,6 +278,13 @@ const setPinned = function (postID, pinned) {
       [postID, pinned]
     )
     .then((res) => res.rows[0]);
+};
+
+const invalidPostID = function (postID) {
+  return Promise.reject({
+    status: 404,
+    message: `Post ${postID} doesn't exist`,
+  });
 };
 
 module.exports = {
