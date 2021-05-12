@@ -302,8 +302,8 @@ const byId = function (courseID, userID) {
     coursePostTagsPromise,
     commentLikesPromise,
     commentEndorsementsPromise,
-  ]).then((results) => {
-    const [
+  ]).then(
+    ([
       courseData,
       courseRole,
       courseTags,
@@ -313,94 +313,97 @@ const byId = function (courseID, userID) {
       coursePostTags,
       commentLikes,
       commentEndorsements,
-    ] = results;
+    ]) => {
+      const { role } = courseRole.rows[0];
 
-    const { role } = courseRole.rows[0];
+      const compiledCourseData = {
+        id: courseData.rows[0].id,
+        name: courseData.rows[0].name,
+        description: courseData.rows[0].description,
+        archived: courseData.rows[0].archived,
+        analytics: {
+          user_count: courseData.rows[0].user_count,
+          total_posts: courseData.rows[0].total_posts,
+          total_comments: courseData.rows[0].total_comments,
+          num_unresolved_questions: courseData.rows[0].num_unresolved_questions,
+          num_resolved_questions: courseData.rows[0].num_resolved_questions,
+        },
+        secrets: {
+          student_access_code: courseData.rows[0].student_access_code,
+          instructor_access_code: courseData.rows[0].instructor_access_code,
+        },
+        tags: courseTags.rows,
+        posts: coursePosts.rows.map((post) => ({
+          ...post,
+          editable: editable(role, post.role, userID, post.user_id),
+          pinnable: pinnable(role),
+          tags: coursePostTags.rows
+            .filter((postTag) => postTag.post_id === post.id)
+            .map((tag) => {
+              delete tag.post_id;
+              return tag;
+            }),
+          comments: courseComments.rows
+            .filter((comment) => comment.post_id === post.id)
+            .map((comment) => ({
+              ...comment,
+              score: parseInt(comment.score),
+              editable: editable(role, comment.role, userID, comment.user_id),
+              endorsable: endorsable(role),
+              liked:
+                commentLikes.rows.filter(
+                  (like) => like.comment_id === comment.id
+                ).length > 0,
+              user_is_post_author: userID === post.user_id,
+              endorsements: commentEndorsements.rows.filter(
+                (endorsement) => endorsement.comment_id === comment.id
+              ),
+              replies: courseCommentReplies.rows
+                .filter((reply) => reply.parent_id === comment.id)
+                .map((reply) => ({
+                  ...reply,
+                  score: parseInt(reply.score),
+                  editable: editable(role, reply.role, userID, reply.user_id),
+                  endorsable: endorsable(role),
+                  liked:
+                    commentLikes.rows.filter(
+                      (like) => like.comment_id === reply.id
+                    ).length > 0,
+                  user_is_post_author: userID === post.user_id,
+                  endorsements: commentEndorsements.rows.filter(
+                    (endorsement) => endorsement.comment_id === reply.id
+                  ),
+                })),
+            })),
+        })),
+      };
 
-    const compiledCourseData = {
-      id: courseData.rows[0].id,
-      name: courseData.rows[0].name,
-      description: courseData.rows[0].description,
-      archived: courseData.rows[0].archived,
-      analytics: {
-        user_count: courseData.rows[0].user_count,
-        total_posts: courseData.rows[0].total_posts,
-        total_comments: courseData.rows[0].total_comments,
-        num_unresolved_questions: courseData.rows[0].num_unresolved_questions,
-        num_resolved_questions: courseData.rows[0].num_resolved_questions,
-      },
-      secrets: {
-        student_access_code: courseData.rows[0].student_access_code,
-        instructor_access_code: courseData.rows[0].instructor_access_code,
-      },
-      tags: courseTags.rows,
-      posts: coursePosts.rows.map((post) => ({
-        ...post,
-        editable: editable(role, post.role, userID, post.user_id),
-        pinnable: pinnable(role),
-        tags: coursePostTags.rows
-          .filter((postTag) => postTag.post_id === post.id)
-          .map((tag) => {
-            delete tag.post_id;
-            return tag;
-          }),
-        comments: courseComments.rows
-          .filter((comment) => comment.post_id === post.id)
-          .map((comment) => ({
-            ...comment,
-            score: parseInt(comment.score),
-            editable: editable(role, comment.role, userID, comment.user_id),
-            endorsable: endorsable(role),
-            liked:
-              commentLikes.rows.filter((like) => like.comment_id === comment.id)
-                .length > 0,
-            endorsements: commentEndorsements.rows.filter(
-              (endorsement) => endorsement.comment_id === comment.id
-            ),
-            replies: courseCommentReplies.rows
-              .filter((reply) => reply.parent_id === comment.id)
-              .map((reply) => ({
-                ...reply,
-                score: parseInt(reply.score),
-                editable: editable(role, reply.role, userID, reply.user_id),
-                endorsable: endorsable(role),
-                liked:
-                  commentLikes.rows.filter(
-                    (like) => like.comment_id === reply.id
-                  ).length > 0,
-                endorsements: commentEndorsements.rows.filter(
-                  (endorsement) => endorsement.comment_id === reply.id
-                ),
-              })),
-          })),
-      })),
-    };
-
-    if (role === "student") {
-      // Remove secrets & names from posts/comments/replies marked as anonymous
-      delete compiledCourseData.secrets;
-      compiledCourseData.posts = compiledCourseData.posts.map((post) => {
-        if (post.anonymous) {
-          post = anonymize(post);
-        }
-        post.comments = post.comments.map((comment) => {
-          if (comment.anonymous) {
-            comment = anonymize(comment);
+      if (role === "student") {
+        // Remove secrets & names from posts/comments/replies marked as anonymous
+        delete compiledCourseData.secrets;
+        compiledCourseData.posts = compiledCourseData.posts.map((post) => {
+          if (post.anonymous) {
+            post = anonymize(post);
           }
-          comment.replies = comment.replies.map((reply) => {
-            if (reply.anonymous) {
-              reply = anonymize(reply);
+          post.comments = post.comments.map((comment) => {
+            if (comment.anonymous) {
+              comment = anonymize(comment);
             }
-            return reply;
+            comment.replies = comment.replies.map((reply) => {
+              if (reply.anonymous) {
+                reply = anonymize(reply);
+              }
+              return reply;
+            });
+            return comment;
           });
-          return comment;
+          return post;
         });
-        return post;
-      });
-    }
+      }
 
-    return Promise.resolve(compiledCourseData);
-  });
+      return Promise.resolve(compiledCourseData);
+    }
+  );
 };
 
 /*

@@ -251,6 +251,7 @@ Response object:
             score: number,
             created_at: timestamp,
             last_modified: timestamp,
+            user_is_post_author: boolean, // true if current user is the author of the post
             endorsements: [
               {
                 id: number,
@@ -276,6 +277,7 @@ Response object:
                 score: number,
                 created_at: timestamp,
                 last_modified: timestamp,
+                user_is_post_author: boolean, // true if current user is the author of the post
                 endorsements: [
                   {
                     id: number,

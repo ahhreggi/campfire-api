@@ -7,6 +7,7 @@ const db = require("../index");
  * @param {number} post.courseID      The course ID.
  * @param {string} post.title         The post title.
  * @param {string} post.body          The post body.
+ * @param {Array}  post.tags          Array of tag IDs.
  * @param {boolean} post.anonymous    If the post should be anonymous.
  * @returns {Promise}                 A promise that resolves to the new post object.
  */
