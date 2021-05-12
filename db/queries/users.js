@@ -14,7 +14,8 @@ const roles = {
  * @param {string} user.lastName - The user's last name.
  * @param {string} user.email - The user's email address.
  * @param {string} user.password - The user's hashed password.
- * @returns {Promise} Promise that resolves to true if user was saved successfully.
+ * @param {number} user.avatarID - The user's avatar ID.
+ * @returns {Promise} Promise that resolves to the new user object (minus password).
  */
 const create = function (user) {
   const { firstName, lastName, email, password, avatarID } = user;
@@ -32,8 +33,8 @@ const create = function (user) {
 
 /**
  *
- * @param {string} email - The user's email address
- * @returns {Object} User object
+ * @param {string} email - The user's email address.
+ * @returns {Promise} A promise that resolves to the user object.
  */
 const byEmail = function (email) {
   return db
@@ -48,7 +49,12 @@ const byEmail = function (email) {
     .then((res) => res.rows[0]);
 };
 
-const isAdmin = function (userId) {
+/**
+ *
+ * @param {number} userID - The user's id.
+ * @returns {Promise} A promise that resolves to the user's admin status.
+ */
+const isAdmin = function (userID) {
   return db
     .query(
       `
@@ -56,7 +62,7 @@ const isAdmin = function (userId) {
     FROM users
     WHERE id = $1;
   `,
-      [userId]
+      [userID]
     )
     .then((res) => res.rows[0].is_admin);
 };
