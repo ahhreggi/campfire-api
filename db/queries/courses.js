@@ -356,6 +356,7 @@ const byId = function (courseID, userID) {
                   (like) => like.comment_id === comment.id
                 ).length > 0,
               user_is_post_author: userID === post.user_id,
+              user_is_comment_author: userID === comment.user_id,
               endorsements: commentEndorsements.rows.filter(
                 (endorsement) => endorsement.comment_id === comment.id
               ),
@@ -371,6 +372,7 @@ const byId = function (courseID, userID) {
                       (like) => like.comment_id === reply.id
                     ).length > 0,
                   user_is_post_author: userID === post.user_id,
+                  user_is_comment_author: userID === reply.user_id,
                   endorsements: commentEndorsements.rows.filter(
                     (endorsement) => endorsement.comment_id === reply.id
                   ),

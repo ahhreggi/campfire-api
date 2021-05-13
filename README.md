@@ -252,6 +252,7 @@ Response object:
             created_at: timestamp,
             last_modified: timestamp,
             user_is_post_author: boolean, // true if current user is the author of the post
+            user_is_comment_author: boolean, // true if current user is author of this comment
             endorsements: [
               {
                 id: number,
@@ -278,6 +279,7 @@ Response object:
                 created_at: timestamp,
                 last_modified: timestamp,
                 user_is_post_author: boolean, // true if current user is the author of the post
+                user_is_comment_author: boolean, // true if current user is author of this comment
                 endorsements: [
                   {
                     id: number,
