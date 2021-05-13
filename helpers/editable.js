@@ -1,7 +1,7 @@
 const { roles } = require("../db/queries/users");
 
 // Determines if a given user has edit permissions on a given post
-const editable = function (userRole, posterRole, userId, posterId) {
+const editable = function (userRole, posterRole, userID, posterID) {
   const { ADMIN, OWNER, INSTRUCTOR } = roles;
 
   // admins can edit any post
@@ -18,7 +18,7 @@ const editable = function (userRole, posterRole, userId, posterId) {
   )
     return true;
   // users can edit their own posts
-  if (posterId === userId) return true;
+  if (posterID === userID) return true;
   // otherwise, no
   return false;
 };

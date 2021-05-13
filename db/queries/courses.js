@@ -338,7 +338,7 @@ const byId = function (courseID, userID) {
         posts: coursePosts.rows.map((post) => ({
           ...post,
           views: parseInt(post.views),
-          editable: editable(role, post.role, userID, post.user_id),
+          editable: editable(role, post.role, userID, post.author_id),
           pinnable: pinnable(role),
           tags: coursePostTags.rows
             .filter((postTag) => postTag.post_id === post.id)
@@ -351,7 +351,7 @@ const byId = function (courseID, userID) {
             .map((comment) => ({
               ...comment,
               score: parseInt(comment.score),
-              editable: editable(role, comment.role, userID, comment.user_id),
+              editable: editable(role, comment.role, userID, comment.author_id),
               endorsable: endorsable(role),
               liked:
                 commentLikes.rows.filter(
@@ -365,7 +365,7 @@ const byId = function (courseID, userID) {
                 .map((reply) => ({
                   ...reply,
                   score: parseInt(reply.score),
-                  editable: editable(role, reply.role, userID, reply.user_id),
+                  editable: editable(role, reply.role, userID, reply.author_id),
                   endorsable: endorsable(role),
                   liked:
                     commentLikes.rows.filter(
