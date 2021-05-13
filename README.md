@@ -201,8 +201,8 @@ Response object:
     id: number, // course id
     name: string, // course name
     description: string, // course description
+    role: string, // user's role in the course
     archived: string, // course archival status
-    // TODO role: string, // user's role in the course
     analytics: {
       user_count: number, // total users enrolled
       total_posts: number,

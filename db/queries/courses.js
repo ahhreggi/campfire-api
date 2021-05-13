@@ -320,6 +320,7 @@ const byId = function (courseID, userID) {
         id: courseData.rows[0].id,
         name: courseData.rows[0].name,
         description: courseData.rows[0].description,
+        role,
         archived: courseData.rows[0].archived,
         analytics: {
           user_count: courseData.rows[0].user_count,
