@@ -255,9 +255,9 @@ Response object:
             score: number,
             created_at: timestamp,
             last_modified: timestamp,
-              role: string,
-              editable: boolean,
-              endorsable: boolean,
+            role: string,
+            editable: boolean,
+            endorsable: boolean,
             endorsements: [
               {
                 id: number,
