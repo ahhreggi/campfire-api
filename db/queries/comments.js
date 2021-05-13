@@ -184,16 +184,29 @@ const getByID = function (commentID) {
  * @returns {Promise}            A promise that resolves to the removed comment.
  */
 const remove = function (commentID) {
+  // If this is a 'best_answer' for any post, set to null
   return db
     .query(
       `
-      UPDATE comments
-      SET active = false
-      WHERE id = $1
-      RETURNING *;
-    `,
+    UPDATE posts
+    SET best_answer = NULL
+    WHERE best_answer = $1;
+  `,
       [commentID]
     )
+    .then(() =>
+      // Set the comment as inactive (ie. deleted)
+      db.query(
+        `
+    UPDATE comments
+    SET active = false
+    WHERE id = $1
+    RETURNING *;
+  `,
+        [commentID]
+      )
+    )
+
     .then((res) => res.rows[0]);
 };
 
