@@ -71,6 +71,7 @@ Response object:
 ```js
   {
     token: string,      // JSON Web Token - required for all future requests
+    userID: number,     // user's ID
     email: string,      // user's email
     firstName: string,  // user's first name
     lastName: string,   // user's last name
@@ -98,6 +99,7 @@ Response object:
 ```js
   {
     token: string,      // JSON Web Token - required for all future requests
+    userID: number,     // user's ID
     email: string,      // user's email
     firstName: string,  // user's first name
     lastName: string,   // user's last name
@@ -200,6 +202,7 @@ Response object:
     name: string, // course name
     description: string, // course description
     archived: string, // course archival status
+    // TODO role: string, // user's role in the course
     analytics: {
       user_count: number, // total users enrolled
       total_posts: number,
@@ -222,6 +225,8 @@ Response object:
         created_at: timestamp,
         last_modifited: timestamp,
         best_answer: number, // comment_id of the 'best_answer'
+        user_id: number,
+        // TODO: change above to author_id
         author_first_name: string, // undefined if post is marked as anonymous and user is not privileged
         author_last_name: string, // undefined if post is marked as anonymous and user is not privileged
         author_avatar_id: number, // '1' if post is marked as anonymous and user is not privileged
@@ -229,7 +234,6 @@ Response object:
         views: number, // number of times post has been viewed by a logged-in user
         anonymous: boolean, // if poster has request anonymity
         role: string, // role of the poster (student/instructor/owner/admin)
-        user_id: number,
         editable: boolean, // user permission to edit this post
         pinnable: boolean, // user has permission to pin this post
         tags: [
@@ -244,6 +248,7 @@ Response object:
             post_id: number,
             liked: boolean,
             anonymous: boolean,
+            // TODO author_id: number,
             author_first_name: string,
             author_last_name: string,
             author_avatar_id: number,

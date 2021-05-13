@@ -24,7 +24,7 @@ const create = function (user) {
       `
     INSERT INTO users (first_name, last_name, email, password, avatar_id)
     VALUES ($1, $2, $3, $4, $5)
-    RETURNING email, first_name, last_name, avatar_id;
+    RETURNING id, email, first_name, last_name, avatar_id;
   `,
       [firstName, lastName, email, hash, avatarID]
     )
