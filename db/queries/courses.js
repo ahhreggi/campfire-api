@@ -192,7 +192,7 @@ const byId = function (courseID, userID) {
         WHEN (SELECT is_admin FROM users WHERE id = posts.user_id) = TRUE THEN 'admin'
         ELSE (SELECT role FROM enrolments WHERE user_id = posts.user_id AND course_id = $1) 
       END AS role,
-      user_id
+      user_id AS author_id
     FROM posts
     WHERE course_id = $1
     AND active = TRUE;
@@ -218,7 +218,7 @@ const byId = function (courseID, userID) {
         WHEN (SELECT is_admin FROM users WHERE id = comments.user_id) = TRUE THEN 'admin'
         ELSE (SELECT role FROM enrolments WHERE user_id = comments.user_id AND course_id = $1) 
       END AS role,
-      user_id
+      user_id AS author_id
     FROM comments
     WHERE post_id in (SELECT id FROM posts WHERE course_id = $1)
     AND parent_id IS NULL
@@ -356,8 +356,6 @@ const byId = function (courseID, userID) {
                 commentLikes.rows.filter(
                   (like) => like.comment_id === comment.id
                 ).length > 0,
-              user_is_post_author: userID === post.user_id,
-              user_is_comment_author: userID === comment.user_id,
               endorsements: commentEndorsements.rows.filter(
                 (endorsement) => endorsement.comment_id === comment.id
               ),
@@ -372,8 +370,6 @@ const byId = function (courseID, userID) {
                     commentLikes.rows.filter(
                       (like) => like.comment_id === reply.id
                     ).length > 0,
-                  user_is_post_author: userID === post.user_id,
-                  user_is_comment_author: userID === reply.user_id,
                   endorsements: commentEndorsements.rows.filter(
                     (endorsement) => endorsement.comment_id === reply.id
                   ),
@@ -384,17 +380,18 @@ const byId = function (courseID, userID) {
 
       if (role === "student") {
         // Remove secrets & names from posts/comments/replies marked as anonymous
+        // (unless it's the user's own post/comment/reply)
         delete compiledCourseData.secrets;
         compiledCourseData.posts = compiledCourseData.posts.map((post) => {
-          if (post.anonymous) {
+          if (post.anonymous && post.author_id !== userID) {
             post = anonymize(post);
           }
           post.comments = post.comments.map((comment) => {
-            if (comment.anonymous) {
+            if (comment.anonymous && comment.author_id !== userID) {
               comment = anonymize(comment);
             }
             comment.replies = comment.replies.map((reply) => {
-              if (reply.anonymous) {
+              if (reply.anonymous && reply.author_id !== userID) {
                 reply = anonymize(reply);
               }
               return reply;
@@ -416,6 +413,7 @@ const byId = function (courseID, userID) {
 
 // strips author name and avatar from posts/comments/replies
 const anonymize = function (obj) {
+  delete obj.author_id;
   delete obj.author_first_name;
   delete obj.author_last_name;
   obj.author_avatar_id = 1;

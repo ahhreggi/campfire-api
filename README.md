@@ -225,8 +225,7 @@ Response object:
         created_at: timestamp,
         last_modifited: timestamp,
         best_answer: number, // comment_id of the 'best_answer'
-        user_id: number,
-        // TODO: change above to author_id
+        author_id: number,
         author_first_name: string, // undefined if post is marked as anonymous and user is not privileged
         author_last_name: string, // undefined if post is marked as anonymous and user is not privileged
         author_avatar_id: number, // '1' if post is marked as anonymous and user is not privileged
@@ -248,7 +247,7 @@ Response object:
             post_id: number,
             liked: boolean,
             anonymous: boolean,
-            // TODO author_id: number,
+            author_id: number,
             author_first_name: string,
             author_last_name: string,
             author_avatar_id: number,
@@ -256,8 +255,9 @@ Response object:
             score: number,
             created_at: timestamp,
             last_modified: timestamp,
-            user_is_post_author: boolean, // true if current user is the author of the post
-            user_is_comment_author: boolean, // true if current user is author of this comment
+              role: string,
+              editable: boolean,
+              endorsable: boolean,
             endorsements: [
               {
                 id: number,
@@ -266,16 +266,13 @@ Response object:
                 comment_id: number
               }
             ],
-            role: string,
-            user_id: number,
-            editable: boolean,
-            endorsable: boolean,
             replies: [
               {
                 id: number,
                 parent_id: number,
                 liked: boolean,
                 anonymous: boolean,
+                author_id: number,
                 author_first_name: string,
                 author_last_name: string,
                 author_avatar_id: number,
@@ -283,8 +280,6 @@ Response object:
                 score: number,
                 created_at: timestamp,
                 last_modified: timestamp,
-                user_is_post_author: boolean, // true if current user is the author of the post
-                user_is_comment_author: boolean, // true if current user is author of this comment
                 endorsements: [
                   {
                     id: number,
@@ -294,7 +289,6 @@ Response object:
                   }
                 ],
                 role: string,
-                user_id: number,
                 editable: boolean,
                 endorsable: boolean,
               }
