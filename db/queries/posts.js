@@ -1,4 +1,5 @@
 const db = require("../index");
+const Courses = require("../queries/courses");
 
 /**
  *
@@ -84,19 +85,23 @@ const course = function (postID) {
 /**
  *
  * @param {number} postID    The post ID.
+ * @param {number} userID    The userID (for getting bookmarked status).
  * @returns {Promise}        A promise that resolves to the post object.
  */
-const getByID = function (postID) {
+const byID = function (postID, userID) {
+  postID = parseInt(postID);
   return db
     .query(
       `
-    SELECT *
+    SELECT course_id
     FROM posts
-    WHERE id = $1;  
-`,
+    WHERE id = $1;
+  `,
       [postID]
     )
-    .then((res) => res.rows[0]);
+    .then((res) => res.rows[0].course_id)
+    .then((courseID) => Courses.byID(courseID, userID))
+    .then((course) => course.posts.filter((post) => post.id === postID));
 };
 
 /**
@@ -311,7 +316,7 @@ module.exports = {
   create,
   remove,
   course,
-  getByID,
+  byID,
   role,
   view,
   author,

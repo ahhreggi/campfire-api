@@ -25,7 +25,9 @@ router.post("/posts", (req, res, next) => {
     }
     // User does have permission - create post
     Posts.create({ userID, courseID, title, body, tags, anonymous })
-      .then((result) => res.send(result))
+      .then((result) => result.id)
+      .then((postID) => Posts.byID(postID))
+      .then((post) => res.send(post))
       .catch((e) => next(e));
   });
 });
@@ -144,7 +146,7 @@ router.patch("/posts/:id", (req, res, next) => {
       return Promise.all(queries);
     })
     // Send back the updated post
-    .then(() => Posts.getByID(postID))
+    .then(() => Posts.byID(postID, userID))
     .then((result) => res.send(result))
     .catch((err) => next(err));
 });

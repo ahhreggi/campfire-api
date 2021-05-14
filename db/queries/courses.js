@@ -21,6 +21,38 @@ const role = function (courseID, userID) {
     .then((res) => res.rows[0].role);
 };
 
+const posts = function (courseID, userID) {
+  return db
+    .query(
+      `
+    SELECT 
+      id, 
+      title, 
+      body, 
+      EXISTS (SELECT * FROM bookmarks WHERE post_id = posts.id AND user_id = $2) AS bookmarked,
+      created_at,
+      last_modified,
+      best_answer,
+      (SELECT first_name FROM users WHERE id = posts.user_id) AS author_first_name,
+      (SELECT last_name FROM users WHERE id = posts.user_id) AS author_last_name,
+      (SELECT avatar_id FROM users WHERE id = posts.user_id) AS author_avatar_id,
+      pinned,
+      (SELECT COUNT(*) FROM post_views WHERE post_id = posts.id) AS views,
+      anonymous,
+      CASE  
+        WHEN (SELECT is_admin FROM users WHERE id = posts.user_id) = TRUE THEN 'admin'
+        ELSE (SELECT role FROM enrolments WHERE user_id = posts.user_id AND course_id = $1) 
+      END AS role,
+      user_id AS author_id
+    FROM posts
+    WHERE course_id = $1
+    AND active = TRUE;
+  `,
+      [courseID, userID]
+    )
+    .then((res) => res.rows);
+};
+
 /**
  *
  * @param {number} userID - The user's ID.
@@ -133,7 +165,7 @@ const create = function (courseData) {
  * @param {number} userID - The user's ID.
  * @returns {Promise} A promise that resolves to the full course object.
  */
-const byId = function (courseID, userID) {
+const byID = function (courseID, userID) {
   const courseDataPromise = db.query(
     `
     SELECT 
@@ -170,34 +202,6 @@ const byId = function (courseID, userID) {
     WHERE course_id = $1;
   `,
     [courseID]
-  );
-
-  const coursePostsPromise = db.query(
-    `
-    SELECT 
-      id, 
-      title, 
-      body, 
-      EXISTS (SELECT * FROM bookmarks WHERE post_id = posts.id AND user_id = $2) AS bookmarked,
-      created_at,
-      last_modified,
-      best_answer,
-      (SELECT first_name FROM users WHERE id = posts.user_id) AS author_first_name,
-      (SELECT last_name FROM users WHERE id = posts.user_id) AS author_last_name,
-      (SELECT avatar_id FROM users WHERE id = posts.user_id) AS author_avatar_id,
-      pinned,
-      (SELECT COUNT(*) FROM post_views WHERE post_id = posts.id) AS views,
-      anonymous,
-      CASE  
-        WHEN (SELECT is_admin FROM users WHERE id = posts.user_id) = TRUE THEN 'admin'
-        ELSE (SELECT role FROM enrolments WHERE user_id = posts.user_id AND course_id = $1) 
-      END AS role,
-      user_id AS author_id
-    FROM posts
-    WHERE course_id = $1
-    AND active = TRUE;
-  `,
-    [courseID, userID]
   );
 
   const courseCommentsPromise = db.query(
@@ -296,7 +300,7 @@ const byId = function (courseID, userID) {
     courseDataPromise,
     courseRolePromise,
     courseTagsPromise,
-    coursePostsPromise,
+    posts(courseID, userID),
     courseCommentsPromise,
     courseCommentRepliesPromise,
     coursePostTagsPromise,
@@ -335,7 +339,7 @@ const byId = function (courseID, userID) {
           instructor_access_code: courseData.rows[0].instructor_access_code,
         },
         tags: courseTags.rows,
-        posts: coursePosts.rows.map((post) => ({
+        posts: coursePosts.map((post) => ({
           ...post,
           views: parseInt(post.views),
           editable: editable(role, post.role, userID, post.author_id),
@@ -428,8 +432,9 @@ const pinnable = endorsable;
 
 module.exports = {
   role,
+  posts,
   forUser,
-  byId,
+  byID,
   byAccessCode,
   enrol,
   create,

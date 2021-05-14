@@ -68,7 +68,7 @@ router.get("/courses/:id", (req, res, next) => {
     .then((courses) => courses.map((course) => course.id))
     .then((courseIDs) => courseIDs.includes(courseID))
     .then((hasAccess) => {
-      if (hasAccess) return Courses.byId(courseID, userID);
+      if (hasAccess) return Courses.byID(courseID, userID);
       else
         return Promise.reject({
           status: 401,
