@@ -83,7 +83,33 @@ INSERT INTO comments (post_id, parent_id, user_id, body) VALUES
 (1, null, 11, 'You can consume a promise by calling .then() on it! Be sure to use .catch() as well in case of errors.'),
 (3, null, 6, 'Ruby functions are declared using the ''def'' keyword, and finish with the end keyword. '),
 (1, 2, 9, 'Thanks for this!!'),
-(2, null, 5, 'You create a class like so: class Animal { }. See the documentation for more info: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes'),
+(2, null, 5, 'You create a class like so: 
+```js
+class Animal {
+	constructor() {
+		super();
+	}
+}
+```
+See the [documentation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes) for more info.
+
+---
+## Some markdown testing:
+
+##### HTML
+
+```html
+<h1>Test</h1>
+<b>test</b>
+```
+##### Ruby
+```ruby
+def do_something
+	yield
+end
+```
+
+Inline highlighting looks like `this()`.'),
 (1, null, 2, 'Note promises can be chained with multiple .then() calls. Be sure to check out Promise.resolve and Promise.reject as well.'),
 (4, null, 13, 'I think it works similar to a callback in JS... can anyone confirm?'),
 (4, null, 14, 'Yes it is similar to a callback. It is a chunk of code that can be executed within another function that uses ''yield''');
