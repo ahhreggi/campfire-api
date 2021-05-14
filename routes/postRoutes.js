@@ -26,7 +26,7 @@ router.post("/posts", (req, res, next) => {
     // User does have permission - create post
     Posts.create({ userID, courseID, title, body, tags, anonymous })
       .then((result) => result.id)
-      .then((postID) => Posts.byID(postID))
+      .then((postID) => Posts.byID(postID, userID))
       .then((post) => res.send(post))
       .catch((e) => next(e));
   });
