@@ -21,10 +21,17 @@ router.post("/join", (req, res, next) => {
       const role =
         accessCode === result.instructor_access_code ? "instructor" : "student";
       Courses.enrol(userID, result.id, role)
-        .then((result) => {
-          res.status(201).send({ redirect_to: `/courses/${result.id}` });
-        })
-        .catch((err) => next(err));
+        .then((result) => Courses.byID(result.course_id, userID))
+        .then((course) => res.send(course))
+        .catch((err) => {
+          if (err.code === "23505") {
+            return next({
+              status: 400,
+              message: "User is already enrolled in this course",
+            });
+          }
+          return next(err);
+        });
     }
   });
 });
@@ -49,7 +56,8 @@ router.post("/create", (req, res, next) => {
     // Add the user as the course owner
     .then((newCourse) => Courses.enrol(userID, newCourse.id, "owner"))
     // Instruct frontend to redirect to new course page
-    .then((result) => res.send({ redirect_to: `/courses/${result.course_id}` }))
+    .then((result) => Courses.byID(result.course_id, userID))
+    .then((course) => res.send(course))
     .catch((err) => next(err));
 });
 
