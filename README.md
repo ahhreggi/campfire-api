@@ -211,6 +211,19 @@ Response object:
       num_unresolved_questions: number, // questions with no 'best_answer'
       num_resolved_questions: number,
     },
+    secrets: {
+      student_access_code: string,    // only provided to instructor and up
+      instructor_access_code: string, // only provided to instructor and up
+    },
+    users: [
+      {
+        user_id: number,
+        first_name: string,
+        last_name: string,
+        avatar_id: number,
+        role: string
+      }
+    ],
     tags: [
       {
         id: number, // tag id
