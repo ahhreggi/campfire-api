@@ -13,6 +13,7 @@ router.post("/join", (req, res, next) => {
 
   Courses.byAccessCode(accessCode).then((courseByAccessCode) => {
     if (!courseByAccessCode) {
+      console.log("no course found for code");
       return next({ status: 400, message: "Invalid access code" });
     } else if (!courseByAccessCode.active) {
       return next({ status: 400, message: "This course is no longer active" });
