@@ -133,7 +133,7 @@ ALTER TABLE "comment_likes" ADD FOREIGN KEY ("comment_id") REFERENCES "comments"
 
 ALTER TABLE "tags" ADD FOREIGN KEY ("course_id") REFERENCES "courses" ("id");
 
-ALTER TABLE "post_tags" ADD FOREIGN KEY ("tag_id") REFERENCES "tags" ("id");
+ALTER TABLE "post_tags" ADD FOREIGN KEY ("tag_id") REFERENCES "tags" ("id") ON DELETE CASCADE;
 
 ALTER TABLE "post_tags" ADD FOREIGN KEY ("post_id") REFERENCES "posts" ("id");
 

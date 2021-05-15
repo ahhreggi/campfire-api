@@ -89,4 +89,25 @@ router.get("/courses/:id", (req, res, next) => {
     .catch((err) => next(err));
 });
 
+router.post("/courses/:id/tags", (req, res, next) => {
+  const { id: userID } = res.locals.decodedToken;
+  const courseID = req.params.id;
+  const tags = req.body;
+
+  Courses.role(courseID, userID)
+    .then((role) => {
+      // Only allow instructor/owner/admin to update course tags
+      if (role !== "instructor" && role !== "owner" && role !== "admin") {
+        return Promise.reject({
+          status: 401,
+          message: "User must be instructor/owner/admin to update course tags",
+        });
+      }
+      // Update the tags
+      return Courses.updateTags(courseID, tags);
+    })
+    .then((tags) => res.send(tags))
+    .catch((err) => next(err));
+});
+
 module.exports = router;

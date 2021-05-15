@@ -53,6 +53,18 @@ const posts = function (courseID, userID) {
     .then((res) => res.rows);
 };
 
+const tags = function (courseID) {
+  return db
+    .query(
+      `
+    SELECT id, name FROM tags
+    WHERE course_id = $1;
+  `,
+      [courseID]
+    )
+    .then((res) => res.rows);
+};
+
 /**
  *
  * @param {number} userID - The user's ID.
@@ -157,6 +169,57 @@ const create = function (courseData) {
       [name, description, studentAccessCode, instructorAccessCode]
     )
     .then((res) => res.rows[0]);
+};
+
+const updateTags = function (courseID, newTags) {
+  // Get current tags
+  return tags(courseID)
+    .then((oldTags) => {
+      // Identify deleted tags
+      console.log("oldTags", oldTags);
+      console.log("newTags", newTags);
+      const deletedTags = oldTags.filter(
+        (oldTag) => !newTags.includes(oldTag.name)
+      );
+      console.log("deletedTags", deletedTags);
+      // Delete these tags (will cascade and remove post_tags entries too)
+      const queries = [];
+      for (deletedTag of deletedTags) {
+        queries.push(
+          db.query(
+            `
+      DELETE FROM tags
+      WHERE id = $1;
+    `,
+            [deletedTag.id]
+          )
+        );
+      }
+      return Promise.all(queries).then(() => {
+        // Identify new tags
+        const tagsToInsert = newTags.filter(
+          (newTag) => !oldTags.some((oldTag) => oldTag.name === newTag)
+        );
+        // Insert these into db
+        const queries = [];
+        for (tagToInsert of tagsToInsert) {
+          queries.push(
+            db.query(
+              `
+            INSERT INTO tags (course_id, name)
+            VALUES ($1, $2);
+          `,
+              [courseID, tagToInsert]
+            )
+          );
+        }
+        return Promise.all(queries);
+      });
+    })
+    .then(() => {
+      // Get updated list of course tags to send back
+      return tags(courseID);
+    });
 };
 
 /**
@@ -438,4 +501,5 @@ module.exports = {
   byAccessCode,
   enrol,
   create,
+  updateTags,
 };

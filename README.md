@@ -303,6 +303,32 @@ Response object:
 
 ---
 
+### `POST /api/courses/:id/tags`
+
+Update a courses tags.
+
+Request object (array):
+
+```js
+[
+  tagName: string,
+]
+
+```
+
+Response object (updated list of tags for the course):
+
+```js
+[
+  {
+    id: number, // tag ID
+    name: string, // tag name
+  },
+];
+```
+
+---
+
 ## Bookmarks
 
 ### `POST /api/bookmarks`
