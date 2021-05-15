@@ -177,16 +177,21 @@ const enrol = function (userID, courseID, role) {
  * @returns {Promise} A promise that resolves to the new course object.
  */
 const create = function (courseData) {
-  const { name, description, studentAccessCode, instructorAccessCode } =
-    courseData;
+  const {
+    name,
+    description,
+    courseCode,
+    studentAccessCode,
+    instructorAccessCode,
+  } = courseData;
   return db
     .query(
       `
-      INSERT INTO courses (name, description, student_access_code, instructor_access_code)
-      VALUES ($1, $2, $3, $4)
+      INSERT INTO courses (name, description, course_code, student_access_code, instructor_access_code)
+      VALUES ($1, $2, $3, $4, $5)
       RETURNING *;
   `,
-      [name, description, studentAccessCode, instructorAccessCode]
+      [name, description, courseCode, studentAccessCode, instructorAccessCode]
     )
     .then((res) => res.rows[0]);
 };
@@ -304,6 +309,19 @@ const updateRole = function (courseID, userID, role) {
     });
 };
 
+const updateCourseCode = function (courseID, courseCode) {
+  return db
+    .query(
+      `
+    UPDATE courses
+    SET course_code = $2
+    WHERE id = $1;
+  `,
+      [courseID, courseCode]
+    )
+    .then((res) => res.rows);
+};
+
 const setAccessCodes = function (
   courseID,
   studentAccessCode,
@@ -356,6 +374,7 @@ const byID = function (courseID, userID) {
       (SELECT COUNT(*) FROM posts WHERE best_answer IS NULL AND course_id = $1) AS num_unresolved_questions,
       student_access_code,
       instructor_access_code,
+      course_code,
       active
     FROM courses
     WHERE id = $1;
@@ -510,6 +529,7 @@ const byID = function (courseID, userID) {
         id: courseData.rows[0].id,
         name: courseData.rows[0].name,
         description: courseData.rows[0].description,
+        course_code: courseData.rows[0].course_code,
         userID,
         role,
         archived: courseData.rows[0].archived,
@@ -633,4 +653,5 @@ module.exports = {
   updateRole,
   setAccessCodes,
   remove,
+  updateCourseCode,
 };

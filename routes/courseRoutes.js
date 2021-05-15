@@ -41,7 +41,7 @@ router.post("/join", (req, res, next) => {
 // Creates a new course
 router.post("/create", (req, res, next) => {
   const { id: userID } = res.locals.decodedToken;
-  const { name, description } = req.body;
+  const { name, description, courseCode } = req.body;
 
   if (!name) return next({ status: 400, message: "Course name is required" });
 
@@ -49,6 +49,7 @@ router.post("/create", (req, res, next) => {
   const courseData = {
     name,
     description,
+    courseCode,
     studentAccessCode: uuid.v4(),
     instructorAccessCode: uuid.v4(),
   };
@@ -93,7 +94,7 @@ router.get("/courses/:id", (req, res, next) => {
 router.patch("/courses/:id", (req, res, next) => {
   const { id: userID } = res.locals.decodedToken;
   const courseID = req.params.id;
-  const { name, description, tags, archive, roles } = req.body;
+  const { name, description, courseCode, tags, archive, roles } = req.body;
 
   // Get course role
   return Courses.role(courseID, userID)
@@ -130,6 +131,16 @@ router.patch("/courses/:id", (req, res, next) => {
           });
 
         queries.push(Courses.updateDescription(courseID, description));
+      }
+
+      if (courseCode) {
+        if (role === "instructor")
+          return Promise.reject({
+            status: 401,
+            message: "Instructors cannot edit the course code",
+          });
+
+        queries.push(Courses.updateCourseCode(courseID, courseCode));
       }
 
       if (archive === true || archive === false) {

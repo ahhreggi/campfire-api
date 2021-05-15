@@ -98,6 +98,7 @@ CREATE TABLE "courses" (
   "id" SERIAL PRIMARY KEY,
   "name" text,
   "description" text,
+  "course_code" varchar(8),
   "student_access_code" text UNIQUE,
   "instructor_access_code" text UNIQUE,
   "archived" boolean DEFAULT false,
