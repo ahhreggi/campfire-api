@@ -248,7 +248,7 @@ const byID = function (courseID, userID) {
         WHEN (SELECT is_admin FROM users WHERE id = comments.user_id) = TRUE THEN 'admin'
         ELSE (SELECT role FROM enrolments WHERE user_id = comments.user_id AND course_id = $1) 
       END AS role,
-      user_id
+      user_id AS author_id
     FROM comments
     WHERE parent_id IN (SELECT id FROM comments WHERE post_id IN (SELECT id FROM posts WHERE course_id = $1))
     AND active = TRUE;
