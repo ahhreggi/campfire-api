@@ -233,15 +233,15 @@ const setTags = function (postID, tags) {
     .then(() => {
       const tagInserts = [];
       for (tag of tags) {
-        db.query(
+        tagInserts.push(db.query(
           `
       INSERT INTO post_tags (tag_id, post_id)
       VALUES ($2, $1)
     `,
           [postID, tag]
-        );
+        ));
       }
-      return Promise.all([tagInserts]);
+      return Promise.all(tagInserts);
     });
 };
 

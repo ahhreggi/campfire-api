@@ -74,7 +74,7 @@ router.patch("/posts/:id", (req, res, next) => {
         queries.push(Posts.setBody(postID, body));
       }
 
-      if (tags && tags.length > 0) {
+      if (tags) {
         queries.push(Posts.setTags(postID, tags));
       }
 
