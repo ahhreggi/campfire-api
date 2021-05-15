@@ -142,29 +142,42 @@ router.patch("/courses/:id", (req, res, next) => {
         queries.push(Courses.archive(courseID, archive));
       }
 
+      if (roles) {
+        if (role === "instructor")
+          return Promise.reject({
+            status: 401,
+            message: "Instructors cannot edit course roles",
+          });
+
+        // Check all roles provided are valid
+        for (role in roles) {
+          console.log("role", role);
+          if (
+            roles[role] !== null &&
+            roles[role] !== "student" &&
+            roles[role] !== "instructor" &&
+            roles[role] !== "owner"
+          ) {
+            return Promise.reject({
+              status: 400,
+              message: "Can only set roles: student, instructor, owner",
+            });
+          }
+        }
+
+        // Update the roles
+        for (role in roles) {
+          queries.push(
+            Courses.updateRole(courseID, parseInt(role), roles[role])
+          );
+        }
+      }
+
       return Promise.all(queries);
     })
     .then(() => Courses.byID(courseID, userID))
     .then((result) => res.send(result))
     .catch((err) => next(err));
-
-  if (tags) {
-    Courses.role(courseID, userID)
-      .then((role) => {
-        // Only allow instructor/owner/admin to update course tags
-        if (role !== "instructor" && role !== "owner" && role !== "admin") {
-          return Promise.reject({
-            status: 401,
-            message:
-              "User must be instructor/owner/admin to update course tags",
-          });
-        }
-        // Update the tags
-        return Courses.updateTags(courseID, tags);
-      })
-      .then((tags) => res.send(tags))
-      .catch((err) => next(err));
-  }
 });
 
 module.exports = router;

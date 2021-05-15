@@ -303,29 +303,29 @@ Response object:
 
 ---
 
-### `POST /api/courses/:id/tags`
+### `PATCH /api/courses/:id`
 
-Update a courses tags.
+Update course data (name, description, tags, archived, user roles).
 
-Request object (array):
+Request object:
 
 ```js
-[
-  tagName: string,
-]
+{
+  name: string,
+  description: string,
+  tags: [
+    tag: string,
+  ],
+  archive: boolean,
+  roles: {
+    targetUserID: targetRole, // targetRole can be 'student', 'instructor', 'owner', or null to remove user from course
+  }
+
+}
 
 ```
 
-Response object (updated list of tags for the course):
-
-```js
-[
-  {
-    id: number, // tag ID
-    name: string, // tag name
-  },
-];
-```
+Response object: updated full course data
 
 ---
 

@@ -21,6 +21,26 @@ const role = function (courseID, userID) {
     .then((res) => res.rows[0].role);
 };
 
+const users = function (courseID) {
+  return db
+    .query(
+      `
+      SELECT 
+        users.id AS user_id,
+        users.first_name AS first_name,
+        users.last_name AS last_name,
+        users.avatar_id AS avatar_id,
+        enrolments.role AS role
+      FROM courses
+      INNER JOIN enrolments ON courses.id = course_id
+      INNER JOIN users ON user_id = users.id
+      WHERE courses.id = $1;
+  `,
+      [courseID]
+    )
+    .then((res) => res.rows);
+};
+
 const posts = function (courseID, userID) {
   return db
     .query(
@@ -264,6 +284,26 @@ const archive = function (courseID, archive) {
     .then((res) => res.rows);
 };
 
+const updateRole = function (courseID, userID, role) {
+  // Delete the existing role
+  return db
+    .query(
+      `
+      DELETE FROM enrolments
+      WHERE user_id = $2
+      AND course_id = $1
+      RETURNING *;
+    `,
+      [courseID, userID]
+    )
+    .then(() => {
+      // If we received a new role, insert it
+      if (role !== null) {
+        return enrol(userID, courseID, role);
+      }
+    });
+};
+
 /**
  *
  * @param {number} courseID - The course ID.
@@ -406,6 +446,7 @@ const byID = function (courseID, userID) {
     courseRolePromise,
     courseTagsPromise,
     posts(courseID, userID),
+    users(courseID),
     courseCommentsPromise,
     courseCommentRepliesPromise,
     coursePostTagsPromise,
@@ -417,6 +458,7 @@ const byID = function (courseID, userID) {
       courseRole,
       courseTags,
       coursePosts,
+      courseUsers,
       courseComments,
       courseCommentReplies,
       coursePostTags,
@@ -443,6 +485,7 @@ const byID = function (courseID, userID) {
           student_access_code: courseData.rows[0].student_access_code,
           instructor_access_code: courseData.rows[0].instructor_access_code,
         },
+        users: courseUsers,
         tags: courseTags.rows,
         posts: coursePosts.map((post) => ({
           ...post,
@@ -537,6 +580,7 @@ const pinnable = endorsable;
 
 module.exports = {
   role,
+  users,
   posts,
   forUser,
   byID,
@@ -547,4 +591,5 @@ module.exports = {
   updateName,
   updateDescription,
   archive,
+  updateRole,
 };
