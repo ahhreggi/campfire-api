@@ -250,6 +250,20 @@ const updateDescription = function (courseID, description) {
     .then((res) => res.rows);
 };
 
+const archive = function (courseID, archive) {
+  return db
+    .query(
+      `
+      UPDATE courses
+      SET archived = $2
+      WHERE id = $1
+      RETURNING *;
+    `,
+      [courseID, archive]
+    )
+    .then((res) => res.rows);
+};
+
 /**
  *
  * @param {number} courseID - The course ID.
@@ -532,4 +546,5 @@ module.exports = {
   updateTags,
   updateName,
   updateDescription,
+  archive,
 };

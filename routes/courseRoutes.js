@@ -93,7 +93,7 @@ router.get("/courses/:id", (req, res, next) => {
 router.patch("/courses/:id", (req, res, next) => {
   const { id: userID } = res.locals.decodedToken;
   const courseID = req.params.id;
-  const { name, description, tags, archived, roles } = req.body;
+  const { name, description, tags, archive, roles } = req.body;
 
   // Get course role
   return Courses.role(courseID, userID)
@@ -130,6 +130,16 @@ router.patch("/courses/:id", (req, res, next) => {
           });
 
         queries.push(Courses.updateDescription(courseID, description));
+      }
+
+      if (archive === true || archive === false) {
+        if (role === "instructor")
+          return Promise.reject({
+            status: 401,
+            message: "Instructors cannot archive courses",
+          });
+
+        queries.push(Courses.archive(courseID, archive));
       }
 
       return Promise.all(queries);
