@@ -304,6 +304,24 @@ const updateRole = function (courseID, userID, role) {
     });
 };
 
+const setAccessCodes = function (
+  courseID,
+  studentAccessCode,
+  instructorAccessCode
+) {
+  return db
+    .query(
+      `
+    UPDATE courses
+    SET student_access_code = $1, instructor_access_code = $2
+    WHERE id = $3
+    RETURNING *;
+  `,
+      [studentAccessCode, instructorAccessCode, courseID]
+    )
+    .then((res) => res.rows);
+};
+
 /**
  *
  * @param {number} courseID - The course ID.
@@ -592,4 +610,5 @@ module.exports = {
   updateDescription,
   archive,
   updateRole,
+  setAccessCodes,
 };

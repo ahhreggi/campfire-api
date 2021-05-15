@@ -342,6 +342,14 @@ Response object: updated full course data
 
 ---
 
+### `POST /api/courses/:id/resetAccessCodes`
+
+Reset a courses access codes.
+
+Response object: update full course data
+
+---
+
 ## Bookmarks
 
 ### `POST /api/bookmarks`

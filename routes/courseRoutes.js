@@ -180,4 +180,31 @@ router.patch("/courses/:id", (req, res, next) => {
     .catch((err) => next(err));
 });
 
+router.post("/courses/:id/resetAccessCodes", (req, res, next) => {
+  const { id: userID } = res.locals.decodedToken;
+  const courseID = req.params.id;
+
+  Courses.role(courseID, userID)
+    .then((role) => {
+      if (role !== "owner") {
+        return Promise.reject({
+          status: 401,
+          message: "Only course owners can reset access codes",
+        });
+      }
+
+      const instructorAccessCode = uuid.v4();
+      const studentAccessCode = uuid.v4();
+
+      return Courses.setAccessCodes(
+        courseID,
+        studentAccessCode,
+        instructorAccessCode
+      );
+    })
+    .then(() => Courses.byID(courseID))
+    .then((result) => res.send(result))
+    .catch((err) => next(err));
+});
+
 module.exports = router;
