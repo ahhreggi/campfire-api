@@ -222,6 +222,34 @@ const updateTags = function (courseID, newTags) {
     });
 };
 
+const updateName = function (courseID, name) {
+  return db
+    .query(
+      `
+    UPDATE courses
+    SET name = $2
+    WHERE id = $1
+    RETURNING *;
+  `,
+      [courseID, name]
+    )
+    .then((res) => res.rows);
+};
+
+const updateDescription = function (courseID, description) {
+  return db
+    .query(
+      `
+    UPDATE courses
+    SET description = $2
+    WHERE id = $1
+    RETURNING *;
+  `,
+      [courseID, description]
+    )
+    .then((res) => res.rows);
+};
+
 /**
  *
  * @param {number} courseID - The course ID.
@@ -502,4 +530,6 @@ module.exports = {
   enrol,
   create,
   updateTags,
+  updateName,
+  updateDescription,
 };
