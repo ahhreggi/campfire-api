@@ -184,13 +184,14 @@ const getByID = function (commentID) {
  * @returns {Promise}            A promise that resolves to the removed comment.
  */
 const remove = function (commentID) {
-  // If this is a 'best_answer' for any post, set to null
+  // If this comment, or any of its replies, are a 'best_answer' for any post -> set to null
   return db
     .query(
       `
-    UPDATE posts
-    SET best_answer = NULL
-    WHERE best_answer = $1;
+      UPDATE posts
+      SET best_answer = NULL
+      WHERE best_answer = $1
+      OR best_answer IN (SELECT id FROM comments WHERE parent_id = $1);
   `,
       [commentID]
     )
