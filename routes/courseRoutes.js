@@ -11,24 +11,26 @@ router.post("/join", (req, res, next) => {
     return next({ status: 400, message: "Access code is required" });
   }
 
-  Courses.byAccessCode(accessCode).then((result) => {
-    if (!result) {
+  Courses.byAccessCode(accessCode).then((courseByAccessCode) => {
+    if (!courseByAccessCode) {
       return next({ status: 400, message: "Invalid access code" });
-    } else if (!result.active) {
+    } else if (!courseByAccessCode.active) {
       return next({ status: 400, message: "This course is no longer active" });
     } else {
       // User entered valid access code for active course - enrol them
       const role =
-        accessCode === result.instructor_access_code ? "instructor" : "student";
-      Courses.enrol(userID, result.id, role)
+        accessCode === courseByAccessCode.instructor_access_code
+          ? "instructor"
+          : "student";
+      Courses.enrol(userID, courseByAccessCode.id, role)
         .then((result) => Courses.byID(result.course_id, userID))
         .then((course) => res.send(course))
         .catch((err) => {
           if (err.code === "23505") {
-            return next({
-              status: 400,
-              message: "User is already enrolled in this course",
-            });
+            // User is already enrolled - just return course data
+            return Courses.byID(courseByAccessCode.id, userID).then((course) =>
+              res.send(course)
+            );
           }
           return next(err);
         });
