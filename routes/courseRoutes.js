@@ -74,16 +74,16 @@ router.get("/courses/:id", (req, res, next) => {
   const { id: userID } = res.locals.decodedToken;
   const courseID = parseInt(req.params.id);
 
-  Courses.forUser(userID)
-    .then((courses) => courses.map((course) => course.id))
-    .then((courseIDs) => courseIDs.includes(courseID))
-    .then((hasAccess) => {
-      if (hasAccess) return Courses.byID(courseID, userID);
-      else
+  Courses.role(courseID, userID)
+    .then((role) => {
+      if (role) {
+        return Courses.byID(courseID, userID);
+      } else {
         return Promise.reject({
           status: 401,
           message: "User doesn't have permission to access this course",
         });
+      }
     })
     .then((courseData) => res.send(courseData))
     .catch((err) => next(err));
@@ -203,6 +203,25 @@ router.post("/courses/:id/resetAccessCodes", (req, res, next) => {
       );
     })
     .then(() => Courses.byID(courseID))
+    .then((result) => res.send(result))
+    .catch((err) => next(err));
+});
+
+router.delete("/courses/:id", (req, res, next) => {
+  const { id: userID } = res.locals.decodedToken;
+  const courseID = req.params.id;
+
+  return Courses.role(courseID, userID)
+    .then((role) => {
+      if (role !== "owner" && role !== "admin") {
+        return Promise.reject({
+          status: 401,
+          message: "Only admins and course owners can delete a course",
+        });
+      }
+
+      return Courses.remove(courseID);
+    })
     .then((result) => res.send(result))
     .catch((err) => next(err));
 });

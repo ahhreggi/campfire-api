@@ -322,6 +322,19 @@ const setAccessCodes = function (
     .then((res) => res.rows);
 };
 
+const remove = function (courseID) {
+  return db
+    .query(
+      `
+    UPDATE courses
+    SET active = false
+    WHERE id = $1;
+  `,
+      [courseID]
+    )
+    .then((res) => res.rowCount === 1);
+};
+
 /**
  *
  * @param {number} courseID - The course ID.
@@ -342,7 +355,8 @@ const byID = function (courseID, userID) {
       (SELECT COUNT(*) FROM posts WHERE best_answer IS NOT NULL AND course_id = $1) AS num_resolved_questions,
       (SELECT COUNT(*) FROM posts WHERE best_answer IS NULL AND course_id = $1) AS num_unresolved_questions,
       student_access_code,
-      instructor_access_code
+      instructor_access_code,
+      active
     FROM courses
     WHERE id = $1;
   `,
@@ -485,6 +499,13 @@ const byID = function (courseID, userID) {
     ]) => {
       const { role } = courseRole.rows[0];
 
+      if (courseData.rows[0].active === false) {
+        return Promise.reject({
+          status: 400,
+          message: "This course has been removed",
+        });
+      }
+
       const compiledCourseData = {
         id: courseData.rows[0].id,
         name: courseData.rows[0].name,
@@ -611,4 +632,5 @@ module.exports = {
   archive,
   updateRole,
   setAccessCodes,
+  remove,
 };

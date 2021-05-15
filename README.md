@@ -342,9 +342,23 @@ Response object: updated full course data
 
 ---
 
+### `DELETE /api/courses/:id`
+
+Delete a course.
+
+Requirements:
+
+1. be course owner or admin
+
+---
+
 ### `POST /api/courses/:id/resetAccessCodes`
 
 Reset a courses access codes.
+
+Requirements:
+
+1. be course owner
 
 Response object: update full course data
 
