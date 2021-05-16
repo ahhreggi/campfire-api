@@ -58,7 +58,24 @@ const remove = function (postID) {
   `,
       [postID]
     )
-    .then((res) => res.rows[0]);
+    .then((res) =>
+      // Also delete any views on the post
+      Promise.all([Promise.resolve(res.rows[0]), removeViews(postID)])
+    )
+    .then(([res, ...extra]) => res);
+};
+
+const removeViews = function (postID) {
+  return db
+    .query(
+      `
+    DELETE FROM post_views
+    WHERE post_id = $1
+    RETURNING *;
+  `,
+      [postID]
+    )
+    .then((res) => res.rows);
 };
 
 /**
