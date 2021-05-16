@@ -665,7 +665,7 @@ const byID = function (courseID, userID) {
           pinnable: pinnable(role),
           viewed:
             coursePostViews.filter((postView) => postView.post_id === post.id)
-              .length > 0,
+              .length > 0 || post.author_id === userID,
           tags: coursePostTags.rows
             .filter((postTag) => postTag.post_id === post.id)
             .map((tag) => {
