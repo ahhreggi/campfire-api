@@ -145,11 +145,31 @@ const view = function (postID, userID) {
   return db
     .query(
       `
+    SELECT user_id
+    FROM posts
+    WHERE id = $1;
+  `,
+      [postID]
+    )
+    .then((res) => res.rows[0].user_id)
+    .then((postUserID) => {
+      if (postUserID === userID) {
+        // user viewing their own post doesn't count
+        return Promise.reject({
+          status: 200,
+          message: "User viewing their own post - won't increment views",
+        });
+      }
+    })
+    .then(() =>
+      db.query(
+        `
     INSERT INTO post_views (post_id, user_id)
     VALUES ($1, $2)
     RETURNING *;
   `,
-      [postID, userID]
+        [postID, userID]
+      )
     )
     .then((res) => res.rows[0]);
 };
