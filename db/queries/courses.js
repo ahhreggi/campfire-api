@@ -378,6 +378,7 @@ const data = function (courseID) {
       student_access_code,
       instructor_access_code,
       course_code,
+      created_at,
       active
     FROM courses
     WHERE id = $1;
@@ -624,6 +625,7 @@ const byID = function (courseID, userID) {
         name: courseData.rows[0].name,
         description: courseData.rows[0].description,
         course_code: courseData.rows[0].course_code,
+        created_at: courseData.rows[0].created_at,
         userID,
         role,
         archived: courseData.rows[0].archived,
