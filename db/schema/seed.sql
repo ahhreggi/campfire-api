@@ -22,12 +22,14 @@ INSERT INTO users (first_name, last_name, email, password, avatar_id) VALUES
 
 UPDATE users SET is_admin = TRUE WHERE id = 1;
 
-INSERT INTO courses (name, description, student_access_code, instructor_access_code) VALUES
-('JS for Beginners', 'Introduction to core JavaScript concepts', '111111', '222222'),
-('Raucous Ruby', 'Introduction to core Ruby concepts', '333333', '444444'),
-('Everything HTML', 'Divs, headers, imgs - we''ll learn it all', '555555', '666666');
+INSERT INTO courses (name, description, student_access_code, instructor_access_code, archived) VALUES
+('JS for Beginners', 'Introduction to core JavaScript concepts', '111111', '222222', false),
+('Raucous Ruby', 'Introduction to core Ruby concepts', '333333', '444444', false),
+('Everything HTML', 'Divs, headers, imgs - we''ll learn it all', '555555', '666666', false),
+('Archived Course', 'I am archived!', 'abc', 'def', true);
 
 INSERT INTO enrolments (user_id, course_id, role) VALUES
+(1, 4, 'owner'),
 (2, 1, 'owner'),
 (3, 2, 'owner'),
 (4, 3, 'owner'),
@@ -70,7 +72,8 @@ INSERT INTO posts (user_id, course_id, title, body) VALUES
 (9, 1, 'How do I use promises?', 'I am using a new library that returns a Promise instead of a callback... how do I act on it once its done?'),
 (10, 1, 'How do I create a class?', 'How do I write a new class in javascript, and declare methods, variables, etc?'),
 (13, 2, 'How do I write a function in Ruby?', 'I am used to JS syntax, how do I write a ruby function?'),
-(14, 2, 'What is a block and how does it work?', 'I see the array each method can take in a block, what is that?');
+(14, 2, 'What is a block and how does it work?', 'I see the array each method can take in a block, what is that?'),
+(1, 4, 'Test Post', 'Welcome to my test post');
 
 
 INSERT INTO post_tags (tag_id, post_id) VALUES
@@ -112,7 +115,9 @@ end
 Inline highlighting looks like `this()`.'),
 (1, null, 2, 'Note promises can be chained with multiple .then() calls. Be sure to check out Promise.resolve and Promise.reject as well.'),
 (4, null, 13, 'I think it works similar to a callback in JS... can anyone confirm?'),
-(4, null, 14, 'Yes it is similar to a callback. It is a chunk of code that can be executed within another function that uses ''yield''');
+(4, null, 14, 'Yes it is similar to a callback. It is a chunk of code that can be executed within another function that uses ''yield'''),
+(5, null, 1, 'Nice post, 5/5'),
+(5, 9, 1, 'Agreed');
 
 UPDATE comments SET anonymous = true WHERE id = 1;
 UPDATE posts SET best_answer = 2 WHERE id = 1;
