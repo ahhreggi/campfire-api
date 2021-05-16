@@ -99,32 +99,59 @@ const forUser = function (userID) {
       [userID]
     )
     .then((res) => {
-      if (res.rows[0].is_admin) {
-        // if user is admin they get all courses
-        return db
-          .query(
-            `
-          SELECT id, name, course_code, created_at, archived, 'admin' as role
-          FROM courses
-          WHERE courses.active = true;
-        `
-          )
-          .then((res) => res.rows);
-      } else {
-        return db
-          .query(
-            `
-          SELECT courses.id as id, name, course_code, courses.created_at as created_at, courses.archived as archived, enrolments.role as role
-          FROM courses
-          JOIN enrolments ON course_id = courses.id
-          JOIN users ON user_id = users.id
-          WHERE users.id = $1
-          AND courses.active = true;
-        `,
-            [userID]
-          )
-          .then((res) => res.rows);
-      }
+      return Promise.resolve()
+        .then(() => {
+          if (res.rows[0].is_admin) {
+            // if user is admin they get all courses
+            return db
+              .query(
+                `
+            SELECT id, name, course_code, created_at, archived, 'admin' as role
+            FROM courses
+            WHERE courses.active = true;
+          `
+              )
+              .then((res) => res.rows);
+          } else {
+            return db
+              .query(
+                `
+            SELECT courses.id as id, name, course_code, courses.created_at as created_at, courses.archived as archived, enrolments.role as role
+            FROM courses
+            JOIN enrolments ON course_id = courses.id
+            JOIN users ON user_id = users.id
+            WHERE users.id = $1
+            AND courses.active = true;
+          `,
+                [userID]
+              )
+              .then((res) => res.rows);
+          }
+        })
+        .then((courses) => {
+          const queries = [courses];
+          for (course of courses) {
+            queries.push(data(course.id).then((res) => res.rows[0]));
+          }
+          return Promise.all(queries);
+        })
+        .then(([courseData, ...analyticData]) => {
+          console.log("courseData", courseData);
+          console.log(analyticData);
+
+          return courseData.map((course) => ({
+            ...course,
+            analytics: analyticData
+              .filter((analytics) => analytics.id === course.id)
+              .map((data) => ({
+                user_count: data.user_count,
+                total_posts: data.total_posts,
+                total_comments: data.total_comments,
+                num_unresolved_questions: data.num_unresolved_questions,
+                num_resolved_questions: data.num_resolved_questions,
+              }))[0],
+          }));
+        });
     });
 };
 
@@ -350,16 +377,10 @@ const remove = function (courseID) {
     .then((res) => res.rowCount === 1);
 };
 
-/**
- *
- * @param {number} courseID - The course ID.
- * @param {number} userID - The user's ID.
- * @returns {Promise} A promise that resolves to the full course object.
- */
-const byID = function (courseID, userID) {
-  const courseDataPromise = db.query(
+const data = function (courseID) {
+  return db.query(
     `
-    SELECT 
+  SELECT 
       id, 
       name,
       description,
@@ -378,7 +399,15 @@ const byID = function (courseID, userID) {
   `,
     [courseID]
   );
+};
 
+/**
+ *
+ * @param {number} courseID - The course ID.
+ * @param {number} userID - The user's ID.
+ * @returns {Promise} A promise that resolves to the full course object.
+ */
+const byID = function (courseID, userID) {
   const courseRolePromise = db.query(
     `
     SELECT 
@@ -504,7 +533,7 @@ const byID = function (courseID, userID) {
     .then((res) => res.rows);
 
   return Promise.all([
-    courseDataPromise,
+    data(courseID),
     courseRolePromise,
     courseTagsPromise,
     posts(courseID, userID),
