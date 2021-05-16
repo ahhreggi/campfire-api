@@ -137,6 +137,12 @@ Response object:
 
 ---
 
+### `POST /api/courses/:id/leave`
+
+Leave a course.
+
+---
+
 ### `POST /api/create`
 
 Creates a new course.
