@@ -38,6 +38,13 @@ router.post("/join", (req, res, next) => {
   });
 });
 
+router.post("/courses/:id/leave", (req, res, next) => {
+  const { id: userID } = res.locals.decodedToken;
+  const courseID = req.params.id;
+
+  Courses.updateRole(courseID, userID, null).then((result) => res.send(result));
+});
+
 // Creates a new course
 router.post("/create", (req, res, next) => {
   const { id: userID } = res.locals.decodedToken;
