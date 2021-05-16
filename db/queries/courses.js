@@ -144,11 +144,13 @@ const forUser = function (userID) {
             analytics: analyticData
               .filter((analytics) => analytics.id === course.id)
               .map((data) => ({
-                user_count: data.user_count,
-                total_posts: data.total_posts,
-                total_comments: data.total_comments,
-                num_unresolved_questions: data.num_unresolved_questions,
-                num_resolved_questions: data.num_resolved_questions,
+                user_count: parseInt(data.user_count),
+                total_posts: parseInt(data.total_posts),
+                total_comments: parseInt(data.total_comments),
+                num_unresolved_questions: parseInt(
+                  data.num_unresolved_questions
+                ),
+                num_resolved_questions: parseInt(data.num_resolved_questions),
               }))[0],
           }));
         });
@@ -576,11 +578,15 @@ const byID = function (courseID, userID) {
         role,
         archived: courseData.rows[0].archived,
         analytics: {
-          user_count: courseData.rows[0].user_count,
-          total_posts: courseData.rows[0].total_posts,
-          total_comments: courseData.rows[0].total_comments,
-          num_unresolved_questions: courseData.rows[0].num_unresolved_questions,
-          num_resolved_questions: courseData.rows[0].num_resolved_questions,
+          user_count: parseInt(courseData.rows[0].user_count),
+          total_posts: parseInt(courseData.rows[0].total_posts),
+          total_comments: parseInt(courseData.rows[0].total_comments),
+          num_unresolved_questions: parseInt(
+            courseData.rows[0].num_unresolved_questions
+          ),
+          num_resolved_questions: parseInt(
+            courseData.rows[0].num_resolved_questions
+          ),
         },
         secrets: {
           student_access_code: courseData.rows[0].student_access_code,
