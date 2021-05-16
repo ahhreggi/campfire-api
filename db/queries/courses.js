@@ -372,7 +372,7 @@ const data = function (courseID) {
       archived,
       (SELECT COUNT(*) FROM enrolments WHERE course_id = $1) AS user_count,
       (SELECT COUNT(*) FROM posts WHERE course_id = $1 AND active = TRUE) AS total_posts,
-      (SELECT COUNT(*) FROM comments WHERE post_id IN (SELECT id FROM posts WHERE course_id = $1)) AS total_comments,
+      (SELECT COUNT(*) FROM comments WHERE post_id IN (SELECT id FROM posts WHERE course_id = $1) AND active = TRUE) AS total_comments,
       (SELECT COUNT(*) FROM posts WHERE best_answer IS NOT NULL AND course_id = $1 AND active = TRUE) AS num_resolved_posts,
       (SELECT COUNT(*) FROM posts WHERE best_answer IS NULL AND course_id = $1 AND active = TRUE) AS num_unresolved_posts,
       student_access_code,
