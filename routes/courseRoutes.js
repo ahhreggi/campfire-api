@@ -169,7 +169,6 @@ router.patch("/courses/:id", (req, res, next) => {
 
         // Check all roles provided are valid
         for (role in roles) {
-          console.log("role", role);
           if (
             roles[role] !== null &&
             roles[role] !== "student" &&

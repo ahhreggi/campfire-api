@@ -136,9 +136,6 @@ const forUser = function (userID) {
           return Promise.all(queries);
         })
         .then(([courseData, ...analyticData]) => {
-          console.log("courseData", courseData);
-          console.log(analyticData);
-
           return courseData.map((course) => ({
             ...course,
             analytics: analyticData
