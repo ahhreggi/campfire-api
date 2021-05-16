@@ -27,7 +27,7 @@ router.post("/posts", (req, res, next) => {
     Posts.create({ userID, courseID, title, body, tags, anonymous })
       .then((result) => result.id)
       .then((postID) =>
-        Promise.all([Posts.view(postID, userID), Posts.byID(postID, userID)])
+        Promise.all([Posts.byID(postID, userID), Posts.view(postID, userID)])
       )
       .then(([post, ...extra]) => res.send(post))
       .catch((e) => next(e));
