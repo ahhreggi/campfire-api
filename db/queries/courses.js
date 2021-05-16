@@ -410,6 +410,15 @@ const data = function (courseID) {
  * @returns {Promise} A promise that resolves to the full course object.
  */
 const byID = function (courseID, userID) {
+  const courseExistsPromise = db.query(
+    `
+    SELECT *
+    FROM courses
+    WHERE id = $1;
+  `,
+    [courseID]
+  );
+
   const courseRolePromise = db.query(
     `
     SELECT 
@@ -535,6 +544,7 @@ const byID = function (courseID, userID) {
     .then((res) => res.rows);
 
   return Promise.all([
+    courseExistsPromise,
     data(courseID),
     courseRolePromise,
     courseTagsPromise,
@@ -548,6 +558,7 @@ const byID = function (courseID, userID) {
     coursePostViewsPromise,
   ]).then(
     ([
+      courseExists,
       courseData,
       courseRole,
       courseTags,
@@ -560,6 +571,13 @@ const byID = function (courseID, userID) {
       commentEndorsements,
       coursePostViews,
     ]) => {
+      if (!courseExists.rows[0]) {
+        return Promise.reject({
+          status: 404,
+          message: `Course ${courseID} doesn't exist`,
+        });
+      }
+
       const { role } = courseRole.rows[0];
 
       if (courseData.rows[0].active === false) {
