@@ -290,6 +290,15 @@ Response object:
             role: string,
             editable: boolean,
             endorsable: boolean,
+            edits: [
+              {
+                user_id: string,
+                first_name: string,
+                last_name: string,
+                role: string,
+                edited_at: timestamp,
+              }
+            ],
             endorsements: [
               {
                 id: number,
@@ -312,6 +321,15 @@ Response object:
                 score: number,
                 created_at: timestamp,
                 last_modified: timestamp,
+                edits: [
+                  {
+                    user_id: string,
+                    first_name: string,
+                    last_name: string,
+                    role: string,
+                    edited_at: timestamp,
+                  }
+                ],
                 endorsements: [
                   {
                     id: number,
