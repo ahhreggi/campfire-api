@@ -185,9 +185,18 @@ Response object:
     id: number, // course id
     name: string, // course name
     course_code: string,
-    created_at: date, // course creation timestamp
-    archived: boolean, // course archival status
+    created_at: timestamp, // course creation timestamp
+    userID: number,
     role: string, // the user's role within the course
+    archived: boolean, // course archival status
+    analytics: {
+      user_count: number,
+      total_posts: number,
+      total_comments: number,
+      num_unresolved_posts: number,
+      num_resolved_posts: number,
+      num_unread_posts: number,
+    },
   },
 ];
 ```
@@ -209,6 +218,8 @@ Response object:
     id: number, // course id
     name: string, // course name
     description: string, // course description
+    course_code: string,
+    created_at: timestamp,
     userID: string,
     role: string, // user's role in the course
     archived: string, // course archival status
