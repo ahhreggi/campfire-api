@@ -633,6 +633,8 @@ const byID = function (courseID, userID) {
         });
       }
 
+      console.log(coursePostViews);
+
       const compiledCourseData = {
         id: courseData.rows[0].id,
         name: courseData.rows[0].name,
@@ -645,11 +647,14 @@ const byID = function (courseID, userID) {
           user_count: parseInt(courseData.rows[0].user_count),
           total_posts: parseInt(courseData.rows[0].total_posts),
           total_comments: parseInt(courseData.rows[0].total_comments),
-          num_unresolved_questions: parseInt(
+          num_unresolved_posts: parseInt(
             courseData.rows[0].num_unresolved_questions
           ),
-          num_resolved_questions: parseInt(
+          num_resolved_posts: parseInt(
             courseData.rows[0].num_resolved_questions
+          ),
+          num_unread_posts: parseInt(
+            courseData.rows[0].total_posts - coursePostViews.length
           ),
         },
         secrets: {
