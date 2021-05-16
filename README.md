@@ -153,7 +153,7 @@ Request object:
   {
     name: string,         // new course name
     description: string,  // new course description (optional)
-    course_code: string,  // 8-char max
+    courseCode: string,  // 8-char max
   }
 ```
 
