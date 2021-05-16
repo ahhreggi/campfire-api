@@ -250,6 +250,7 @@ Response object:
         role: string, // role of the poster (student/instructor/owner/admin)
         editable: boolean, // user permission to edit this post
         pinnable: boolean, // user has permission to pin this post
+        viewed: boolean    // user has viewed this post
         tags: [
           {
             id: number,

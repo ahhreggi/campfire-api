@@ -492,6 +492,20 @@ const byID = function (courseID, userID) {
     WHERE role IN ('instructor', 'owner', 'admin');
   `);
 
+  const coursePostViewsPromise = db
+    .query(
+      `
+      SELECT post_views.user_id, post_views.post_id
+      FROM post_views
+      INNER JOIN posts ON posts.id = post_id
+      INNER JOIN courses ON courses.id = course_id
+      WHERE courses.id = $1
+      AND post_views.user_id = $2;
+  `,
+      [courseID, userID]
+    )
+    .then((res) => res.rows);
+
   return Promise.all([
     courseDataPromise,
     courseRolePromise,
@@ -503,6 +517,7 @@ const byID = function (courseID, userID) {
     coursePostTagsPromise,
     commentLikesPromise,
     commentEndorsementsPromise,
+    coursePostViewsPromise,
   ]).then(
     ([
       courseData,
@@ -515,8 +530,11 @@ const byID = function (courseID, userID) {
       coursePostTags,
       commentLikes,
       commentEndorsements,
+      coursePostViews,
     ]) => {
       const { role } = courseRole.rows[0];
+
+      console.log(coursePostViews);
 
       if (courseData.rows[0].active === false) {
         return Promise.reject({
@@ -551,6 +569,9 @@ const byID = function (courseID, userID) {
           views: parseInt(post.views),
           editable: editable(role, post.role, userID, post.author_id),
           pinnable: pinnable(role),
+          viewed:
+            coursePostViews.filter((postView) => postView.post_id === post.id)
+              .length > 0,
           tags: coursePostTags.rows
             .filter((postTag) => postTag.post_id === post.id)
             .map((tag) => {
