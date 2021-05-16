@@ -99,59 +99,45 @@ const forUser = function (userID) {
       [userID]
     )
     .then((res) => {
-      return Promise.resolve()
-        .then(() => {
-          if (res.rows[0].is_admin) {
-            // if user is admin they get all courses
-            return db
-              .query(
-                `
-            SELECT id, name, course_code, created_at, archived, 'admin' as role
-            FROM courses
-            WHERE courses.active = true;
-          `
-              )
-              .then((res) => res.rows);
-          } else {
-            return db
-              .query(
-                `
-            SELECT courses.id as id, name, course_code, courses.created_at as created_at, courses.archived as archived, enrolments.role as role
-            FROM courses
-            JOIN enrolments ON course_id = courses.id
-            JOIN users ON user_id = users.id
-            WHERE users.id = $1
-            AND courses.active = true;
-          `,
-                [userID]
-              )
-              .then((res) => res.rows);
-          }
-        })
-        .then((courses) => {
-          const queries = [courses];
-          for (course of courses) {
-            queries.push(data(course.id).then((res) => res.rows[0]));
-          }
-          return Promise.all(queries);
-        })
-        .then(([courseData, ...analyticData]) => {
-          return courseData.map((course) => ({
-            ...course,
-            analytics: analyticData
-              .filter((analytics) => analytics.id === course.id)
-              .map((data) => ({
-                user_count: parseInt(data.user_count),
-                total_posts: parseInt(data.total_posts),
-                total_comments: parseInt(data.total_comments),
-                num_unresolved_questions: parseInt(
-                  data.num_unresolved_questions
-                ),
-                num_resolved_questions: parseInt(data.num_resolved_questions),
-              }))[0],
-          }));
-        });
-    });
+      if (res.rows[0].is_admin) {
+        // if user is admin they get all courses
+        return db
+          .query(
+            `
+          SELECT id 
+          FROM courses;
+        `
+          )
+          .then((res) => res.rows);
+      } else {
+        return db
+          .query(
+            `
+          SELECT course_id
+          FROM enrolments
+          WHERE user_id = $1
+        `,
+            [userID]
+          )
+          .then((res) => res.rows);
+      }
+    })
+    .then((courses) => {
+      const queries = [];
+      for (course of courses) {
+        queries.push(byID(course.id, userID));
+      }
+      return Promise.all(queries);
+    })
+    .then((courseData) =>
+      courseData.map((course) => {
+        delete course.secrets;
+        delete course.users;
+        delete course.tags;
+        delete course.posts;
+        return course;
+      })
+    );
 };
 
 /**
@@ -387,8 +373,8 @@ const data = function (courseID) {
       (SELECT COUNT(*) FROM enrolments WHERE course_id = $1) AS user_count,
       (SELECT COUNT(*) FROM posts WHERE course_id = $1) AS total_posts,
       (SELECT COUNT(*) FROM comments WHERE post_id IN (SELECT id FROM posts WHERE course_id = $1)) AS total_comments,
-      (SELECT COUNT(*) FROM posts WHERE best_answer IS NOT NULL AND course_id = $1) AS num_resolved_questions,
-      (SELECT COUNT(*) FROM posts WHERE best_answer IS NULL AND course_id = $1) AS num_unresolved_questions,
+      (SELECT COUNT(*) FROM posts WHERE best_answer IS NOT NULL AND course_id = $1) AS num_resolved_posts,
+      (SELECT COUNT(*) FROM posts WHERE best_answer IS NULL AND course_id = $1) AS num_unresolved_posts,
       student_access_code,
       instructor_access_code,
       course_code,
@@ -633,8 +619,6 @@ const byID = function (courseID, userID) {
         });
       }
 
-      console.log(coursePostViews);
-
       const compiledCourseData = {
         id: courseData.rows[0].id,
         name: courseData.rows[0].name,
@@ -648,11 +632,9 @@ const byID = function (courseID, userID) {
           total_posts: parseInt(courseData.rows[0].total_posts),
           total_comments: parseInt(courseData.rows[0].total_comments),
           num_unresolved_posts: parseInt(
-            courseData.rows[0].num_unresolved_questions
+            courseData.rows[0].num_unresolved_posts
           ),
-          num_resolved_posts: parseInt(
-            courseData.rows[0].num_resolved_questions
-          ),
+          num_resolved_posts: parseInt(courseData.rows[0].num_resolved_posts),
           num_unread_posts: parseInt(
             courseData.rows[0].total_posts - coursePostViews.length
           ),

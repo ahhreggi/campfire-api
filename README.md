@@ -216,8 +216,9 @@ Response object:
       user_count: number, // total users enrolled
       total_posts: number,
       total_comments: number,
-      num_unresolved_questions: number, // questions with no 'best_answer'
-      num_resolved_questions: number,
+      num_unresolved_posts: number, // questions with no 'best_answer'
+      num_resolved_posts: number,
+      num_unread_posts: number,
     },
     secrets: {
       student_access_code: string,    // only provided to instructor and up
