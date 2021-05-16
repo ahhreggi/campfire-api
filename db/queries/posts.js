@@ -181,7 +181,7 @@ const author = function (postID) {
  * @param {string} title     The post title.
  * @returns {Promise}        A promise that resolves to the updated post object.
  */
-const setTitle = function (postID, title) {
+const setTitle = function (postID, title, userID) {
   return db
     .query(
       `
@@ -192,6 +192,15 @@ const setTitle = function (postID, title) {
   `,
       [postID, title]
     )
+    .then(() =>
+      db.query(
+        `
+      INSERT INTO post_edits (post_id, user_id, edited_at)
+      VALUES ($1, $2, now());
+    `,
+        [postID, userID]
+      )
+    )
     .then((res) => res.rows[0]);
 };
 
@@ -201,7 +210,7 @@ const setTitle = function (postID, title) {
  * @param {string} body     The post body.
  * @returns {Promise}        A promise that resolves to the updated post object.
  */
-const setBody = function (postID, body) {
+const setBody = function (postID, body, userID) {
   return db
     .query(
       `
@@ -211,6 +220,15 @@ const setBody = function (postID, body) {
     RETURNING *;
   `,
       [postID, body]
+    )
+    .then(() =>
+      db.query(
+        `
+      INSERT INTO post_edits (post_id, user_id, edited_at)
+      VALUES ($1, $2, now());
+    `,
+        [postID, userID]
+      )
     )
     .then((res) => res.rows[0]);
 };
@@ -233,13 +251,15 @@ const setTags = function (postID, tags) {
     .then(() => {
       const tagInserts = [];
       for (tag of tags) {
-        tagInserts.push(db.query(
-          `
+        tagInserts.push(
+          db.query(
+            `
       INSERT INTO post_tags (tag_id, post_id)
       VALUES ($2, $1)
     `,
-          [postID, tag]
-        ));
+            [postID, tag]
+          )
+        );
       }
       return Promise.all(tagInserts);
     });

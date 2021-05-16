@@ -67,11 +67,11 @@ router.patch("/posts/:id", (req, res, next) => {
       const queries = [];
 
       if (title && title.length > 0) {
-        queries.push(Posts.setTitle(postID, title));
+        queries.push(Posts.setTitle(postID, title, userID));
       }
 
       if (body && body.length > 0) {
-        queries.push(Posts.setBody(postID, body));
+        queries.push(Posts.setBody(postID, body, userID));
       }
 
       if (tags) {

@@ -5,6 +5,8 @@ DROP TABLE IF EXISTS comments CASCADE;
 DROP TABLE IF EXISTS comment_likes CASCADE;
 DROP TABLE IF EXISTS tags CASCADE;
 DROP TABLE IF EXISTS post_tags CASCADE;
+DROP TABLE IF EXISTS post_edits CASCADE;
+DROP TABLE IF EXISTS comment_edits CASCADE;
 DROP TABLE IF EXISTS post_views CASCADE;
 DROP TABLE IF EXISTS bookmarks CASCADE;
 DROP TABLE IF EXISTS courses CASCADE;
@@ -85,6 +87,20 @@ CREATE TABLE "post_views" (
   UNIQUE("post_id", "user_id")
 );
 
+CREATE TABLE "post_edits" (
+  "id" SERIAL PRIMARY KEY,
+  "post_id" int,
+  "user_id" int,
+  "edited_at" timestamp
+);
+
+CREATE TABLE "comment_edits" (
+  "id" SERIAL PRIMARY KEY,
+  "comment_id" int,
+  "user_id" int,
+  "edited_at" timestamp
+);
+
 CREATE TABLE "bookmarks" (
   "id" SERIAL PRIMARY KEY,
   "user_id" int,
@@ -140,6 +156,14 @@ ALTER TABLE "post_tags" ADD FOREIGN KEY ("post_id") REFERENCES "posts" ("id");
 ALTER TABLE "post_views" ADD FOREIGN KEY ("post_id") REFERENCES "posts" ("id");
 
 ALTER TABLE "post_views" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
+
+ALTER TABLE "post_edits" ADD FOREIGN KEY ("post_id") REFERENCES "posts" ("id");
+
+ALTER TABLE "post_edits" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
+
+ALTER TABLE "comment_edits" ADD FOREIGN KEY ("comment_id") REFERENCES "comments" ("id");
+
+ALTER TABLE "comment_edits" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 
 ALTER TABLE "bookmarks" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 
