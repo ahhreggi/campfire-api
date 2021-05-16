@@ -565,6 +565,29 @@ const byID = function (courseID, userID) {
     )
     .then((res) => res.rows);
 
+  const courseCommentEditsPromise = db
+    .query(
+      `
+    SELECT 
+      comment_edits.user_id,
+      comment_edits.comment_id,
+      first_name,
+      last_name,
+      CASE 
+        WHEN (SELECT is_admin FROM users WHERE id = comment_edits.user_id) = TRUE THEN 'admin'
+        ELSE (SELECT role FROM enrolments WHERE user_id = comment_edits.user_id AND course_id = posts.course_id) 
+      END AS role,
+      edited_at
+    FROM comment_edits
+    INNER JOIN users ON comment_edits.user_id = users.id
+    INNER JOIN comments ON comment_edits.comment_id = comments.id
+    INNER JOIN posts ON comments.post_id = posts.id
+    WHERE posts.course_id = $1;
+  `,
+      [courseID]
+    )
+    .then((res) => res.rows);
+
   return Promise.all([
     courseExistsPromise,
     data(courseID),
@@ -579,6 +602,7 @@ const byID = function (courseID, userID) {
     commentEndorsementsPromise,
     coursePostViewsPromise,
     coursePostEditsPromise,
+    courseCommentEditsPromise,
   ]).then(
     ([
       courseExists,
@@ -594,6 +618,7 @@ const byID = function (courseID, userID) {
       commentEndorsements,
       coursePostViews,
       coursePostEdits,
+      courseCommentEdits,
     ]) => {
       if (!courseExists.rows[0]) {
         return Promise.reject({
@@ -667,6 +692,12 @@ const byID = function (courseID, userID) {
                 commentLikes.rows.filter(
                   (like) => like.comment_id === comment.id
                 ).length > 0,
+              edits: courseCommentEdits
+                .filter((commentEdit) => commentEdit.comment_id === comment.id)
+                .map((commentEdit) => {
+                  delete commentEdit.comment_id;
+                  return commentEdit;
+                }),
               endorsements: commentEndorsements.rows.filter(
                 (endorsement) => endorsement.comment_id === comment.id
               ),
@@ -681,6 +712,14 @@ const byID = function (courseID, userID) {
                     commentLikes.rows.filter(
                       (like) => like.comment_id === reply.id
                     ).length > 0,
+                  edits: courseCommentEdits
+                    .filter(
+                      (commentEdit) => commentEdit.comment_id === reply.id
+                    )
+                    .map((commentEdit) => {
+                      delete commentEdit.comment_id;
+                      return commentEdit;
+                    }),
                   endorsements: commentEndorsements.rows.filter(
                     (endorsement) => endorsement.comment_id === reply.id
                   ),

@@ -77,7 +77,7 @@ router.patch("/comments/:id", (req, res, next) => {
       const queries = [];
 
       if (body && body.length > 0) {
-        queries.push(Comments.setBody(commentID, body));
+        queries.push(Comments.setBody(commentID, body, userID));
       }
       if (anonymous === false || anonymous === true) {
         queries.push(Comments.setAnonymity(commentID, anonymous));

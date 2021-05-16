@@ -126,7 +126,7 @@ const author = function (commentID) {
  * @param {string} body          The comment body.
  * @returns {Promise}            A promise that resolves to the updated comment.
  */
-const setBody = function (commentID, body) {
+const setBody = function (commentID, body, userID) {
   return db
     .query(
       `
@@ -136,6 +136,15 @@ const setBody = function (commentID, body) {
     RETURNING *;
   `,
       [commentID, body]
+    )
+    .then(() =>
+      db.query(
+        `
+      INSERT INTO comment_edits (comment_id, user_id, edited_at)
+      VALUES ($1, $2, now());
+    `,
+        [commentID, userID]
+      )
     )
     .then((res) => res.rows[0]);
 };
