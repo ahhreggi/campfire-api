@@ -178,6 +178,7 @@ Response object:
   {
     id: number, // course id
     name: string, // course name
+    course_code: string,
     created_at: date, // course creation timestamp
     archived: boolean, // course archival status
     role: string, // the user's role within the course

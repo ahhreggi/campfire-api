@@ -104,7 +104,7 @@ const forUser = function (userID) {
         return db
           .query(
             `
-          SELECT courses.id as id, name, courses.created_at as created_at, courses.archived as archived, 'admin' as role
+          SELECT id, name, course_code, created_at, archived, 'admin' as role
           FROM courses
           WHERE courses.active = true;
         `
@@ -114,7 +114,7 @@ const forUser = function (userID) {
         return db
           .query(
             `
-          SELECT courses.id as id, name, courses.created_at as created_at, courses.archived as archived, enrolments.role as role
+          SELECT courses.id as id, name, course_code, courses.created_at as created_at, courses.archived as archived, enrolments.role as role
           FROM courses
           JOIN enrolments ON course_id = courses.id
           JOIN users ON user_id = users.id
