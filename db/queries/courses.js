@@ -660,12 +660,13 @@ const byID = function (courseID, userID) {
         tags: courseTags.rows,
         posts: coursePosts.map((post) => ({
           ...post,
-          views: parseInt(post.views),
+          // subtract 1 to ignore user's own post view (will always be there)
+          views: parseInt(post.views) - 1,
           editable: editable(role, post.role, userID, post.author_id),
           pinnable: pinnable(role),
           viewed:
             coursePostViews.filter((postView) => postView.post_id === post.id)
-              .length > 0 || post.author_id === userID,
+              .length > 0,
           tags: coursePostTags.rows
             .filter((postTag) => postTag.post_id === post.id)
             .map((tag) => {

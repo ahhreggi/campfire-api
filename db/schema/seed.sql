@@ -75,6 +75,13 @@ INSERT INTO posts (user_id, course_id, title, body) VALUES
 (14, 2, 'What is a block and how does it work?', 'I see the array each method can take in a block, what is that?'),
 (1, 4, 'Test Post', 'Welcome to my test post');
 
+INSERT INTO post_views (post_id, user_id) VALUES
+(1, 9),
+(2, 10),
+(3, 13),
+(4, 14),
+(5, 1);
+
 
 INSERT INTO post_tags (tag_id, post_id) VALUES
 (3, 1),
