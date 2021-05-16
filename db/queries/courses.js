@@ -201,12 +201,9 @@ const updateTags = function (courseID, newTags) {
   return tags(courseID)
     .then((oldTags) => {
       // Identify deleted tags
-      console.log("oldTags", oldTags);
-      console.log("newTags", newTags);
       const deletedTags = oldTags.filter(
         (oldTag) => !newTags.includes(oldTag.name)
       );
-      console.log("deletedTags", deletedTags);
       // Delete these tags (will cascade and remove post_tags entries too)
       const queries = [];
       for (deletedTag of deletedTags) {
@@ -533,8 +530,6 @@ const byID = function (courseID, userID) {
       coursePostViews,
     ]) => {
       const { role } = courseRole.rows[0];
-
-      console.log(coursePostViews);
 
       if (courseData.rows[0].active === false) {
         return Promise.reject({
