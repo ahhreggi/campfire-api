@@ -171,32 +171,44 @@ const enrol = function (userID, courseID, role) {
   return db
     .query(
       `
+    SELECT * FROM enrolments
+    WHERE user_id = $1
+    AND course_id = $2;
+  `,
+      [userID, courseID]
+    )
+    .then((res) => {
+      if (res.rows.length > 0 && res.rows[0].active === true) {
+        // If user is already enrolled, reject
+        return Promise.reject({
+          status: 200,
+          message: "User already enrolled in this course",
+        });
+      } else if (res.rows.length > 0) {
+        // User was previously enrolled, set active with new role
+        return db.query(
+          `
+          UPDATE enrolments
+          SET active = TRUE, role = $3
+          WHERE course_id = $1
+          AND user_id = $2
+          RETURNING *;
+        `,
+          [courseID, userID, role]
+        );
+      } else {
+        // User is not enrolled, insert
+        return db.query(
+          `
       INSERT INTO enrolments (user_id, course_id, role)
       VALUES ($1, $2, $3)
       RETURNING *;
   `,
-      [userID, courseID, role]
-    )
-    .then((res) => res.rows[0])
-    .catch((err) => {
-      if (err.code === "23505") {
-        // User already enrolled - set active = true
-        return db
-          .query(
-            `
-        UPDATE enrolments
-        SET active = TRUE, role = $3, join_date = now()
-        WHERE user_id = $1
-        AND course_id = $2
-        RETURNING *;
-      `,
-            [userID, courseID, role]
-          )
-          .then((res) => res.rows[0]);
-      } else {
-        return Promise.reject(err);
+          [userID, courseID, role]
+        );
       }
-    });
+    })
+    .then((res) => res.rows[0]);
 };
 
 const unenrol = function (courseID, userID) {
