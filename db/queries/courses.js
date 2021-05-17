@@ -13,7 +13,7 @@ const role = function (courseID, userID) {
       `
     SELECT 
       CASE WHEN (SELECT is_admin FROM users WHERE id = $2) = TRUE THEN 'admin'
-      ELSE (SELECT role FROM enrolments WHERE user_id = $2 AND course_id = $1)
+      ELSE (SELECT role FROM enrolments WHERE user_id = $2 AND course_id = $1 AND active = TRUE)
     END AS role
   `,
       [courseID, userID]
@@ -116,6 +116,7 @@ const forUser = function (userID) {
           SELECT course_id AS id
           FROM enrolments
           WHERE user_id = $1
+          AND active = TRUE;
         `,
             [userID]
           )
@@ -175,6 +176,21 @@ const enrol = function (userID, courseID, role) {
       RETURNING *;
   `,
       [userID, courseID, role]
+    )
+    .then((res) => res.rows[0]);
+};
+
+const unenrol = function (courseID, userID) {
+  return db
+    .query(
+      `
+    UPDATE enrolments
+    SET active = FALSE
+    WHERE user_id = $1 
+    AND course_id = $2
+    RETURNING *;
+  `,
+      [userID, courseID]
     )
     .then((res) => res.rows[0]);
 };
@@ -370,7 +386,7 @@ const data = function (courseID) {
       name,
       description,
       archived,
-      (SELECT COUNT(*) FROM enrolments WHERE course_id = $1) AS user_count,
+      (SELECT COUNT(*) FROM enrolments WHERE course_id = $1 AND active = TRUE) AS user_count,
       (SELECT COUNT(*) FROM posts WHERE course_id = $1 AND active = TRUE) AS total_posts,
       (SELECT COUNT(*) FROM comments WHERE post_id IN (SELECT id FROM posts WHERE course_id = $1) AND active = TRUE) AS total_comments,
       (SELECT COUNT(*) FROM posts WHERE best_answer IS NOT NULL AND course_id = $1 AND active = TRUE) AS num_resolved_posts,
@@ -772,6 +788,7 @@ module.exports = {
   byID,
   byAccessCode,
   enrol,
+  unenrol,
   create,
   updateTags,
   updateName,

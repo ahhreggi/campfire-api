@@ -126,7 +126,7 @@ CREATE TABLE "enrolments" (
   "course_id" int,
   "role" roles,
   "banned" boolean DEFAULT false,
-  "enrolled" boolean DEFAULT true,
+  "active" boolean DEFAULT true,
   UNIQUE ("user_id", "course_id")
 );
 
