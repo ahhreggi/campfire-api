@@ -113,7 +113,7 @@ const forUser = function (userID) {
         return db
           .query(
             `
-          SELECT course_id
+          SELECT course_id AS id
           FROM enrolments
           WHERE user_id = $1
         `,
