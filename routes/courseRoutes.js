@@ -25,15 +25,7 @@ router.post("/join", (req, res, next) => {
       Courses.enrol(userID, courseByAccessCode.id, role)
         .then((result) => Courses.byID(result.course_id, userID))
         .then((course) => res.send(course))
-        .catch((err) => {
-          if (err.code === "23505") {
-            // User is already enrolled - just return course data
-            return Courses.byID(courseByAccessCode.id, userID).then((course) =>
-              res.send(course)
-            );
-          }
-          return next(err);
-        });
+        .catch((err) => next(err));
     }
   });
 });

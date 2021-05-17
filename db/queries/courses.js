@@ -177,7 +177,26 @@ const enrol = function (userID, courseID, role) {
   `,
       [userID, courseID, role]
     )
-    .then((res) => res.rows[0]);
+    .then((res) => res.rows[0])
+    .catch((err) => {
+      if (err.code === "23505") {
+        // User already enrolled - set active = true
+        return db
+          .query(
+            `
+        UPDATE enrolments
+        SET active = TRUE, role = $3
+        WHERE user_id = $1
+        AND course_id = $2
+        RETURNING *;
+      `,
+            [userID, courseID, role]
+          )
+          .then((res) => res.rows[0]);
+      } else {
+        return Promise.reject(err);
+      }
+    });
 };
 
 const unenrol = function (courseID, userID) {
