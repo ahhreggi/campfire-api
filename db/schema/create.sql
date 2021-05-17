@@ -125,8 +125,8 @@ CREATE TABLE "enrolments" (
   "user_id" int,
   "course_id" int,
   "role" roles,
-  "banned" boolean DEFAULT false,
   "active" boolean DEFAULT true,
+  "join_date" timestamp DEFAULT (now()),
   UNIQUE ("user_id", "course_id")
 );
 

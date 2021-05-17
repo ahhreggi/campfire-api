@@ -185,7 +185,7 @@ const enrol = function (userID, courseID, role) {
           .query(
             `
         UPDATE enrolments
-        SET active = TRUE, role = $3
+        SET active = TRUE, role = $3, join_date = now()
         WHERE user_id = $1
         AND course_id = $2
         RETURNING *;
@@ -449,6 +449,16 @@ const byID = function (courseID, userID) {
     [courseID, userID]
   );
 
+  const courseJoinDatePromise = db.query(
+    `
+    SELECT join_date
+    FROM enrolments
+    WHERE user_id = $1
+    AND course_id = $2;
+  `,
+    [userID, courseID]
+  );
+
   const courseTagsPromise = db.query(
     `
     SELECT id, name FROM tags
@@ -612,6 +622,7 @@ const byID = function (courseID, userID) {
     courseExistsPromise,
     data(courseID),
     courseRolePromise,
+    courseJoinDatePromise,
     courseTagsPromise,
     posts(courseID, userID),
     users(courseID),
@@ -628,6 +639,7 @@ const byID = function (courseID, userID) {
       courseExists,
       courseData,
       courseRole,
+      courseJoinDate,
       courseTags,
       coursePosts,
       courseUsers,
@@ -665,6 +677,7 @@ const byID = function (courseID, userID) {
         owner_name: courseData.rows[0].owner_name,
         userID,
         role,
+        join_date: courseJoinDate.rows[0].join_date,
         archived: courseData.rows[0].archived,
         analytics: {
           user_count: parseInt(courseData.rows[0].user_count),
