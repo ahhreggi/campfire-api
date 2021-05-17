@@ -2,6 +2,7 @@ const router = require("express").Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const Users = require("../db/queries/users");
+const { isAuthenticated } = require("../middleware/authentication");
 
 // Register a new user
 router.post("/register", (req, res, next) => {
@@ -96,6 +97,66 @@ router.post("/login", (req, res, next) => {
         next({ status: 401, message: "Invalid password" });
       }
     })
+    .catch((err) => next(err));
+});
+
+// Update a user's details
+router.patch("/user", isAuthenticated, (req, res, next) => {
+  const { id: userID } = res.locals.decodedToken;
+  const { firstName, lastName, email, password, avatarID } = req.body;
+
+  if (!firstName && !lastName && !email && !password && !avatarID) {
+    return next({
+      status: 400,
+      message:
+        "Must provide one of: firstName, lastName, email, password, avatarID",
+    });
+  }
+
+  const queries = [];
+
+  if (firstName) {
+    queries.push(Users.setFirstName(userID, firstName));
+  }
+
+  if (lastName) {
+    queries.push(Users.setLastName(userID, lastName));
+  }
+
+  if (email) {
+    queries.push(Users.setEmail(userID, email));
+  }
+
+  if (password) {
+    queries.push(
+      bcrypt.hash(password, 10).then((hash) => Users.setPassword(userID, hash))
+    );
+  }
+
+  if (avatarID) {
+    if (avatarID < 2 || avatarID > 23) {
+      queries.push(
+        Promise.reject({
+          status: 400,
+          message: "avatarID must be between 2 and 23 (inclusive)",
+        })
+      );
+    } else {
+      queries.push(Users.setAvatar(userID, avatarID));
+    }
+  }
+
+  return Promise.all(queries)
+    .then(() => Users.byID(userID))
+    .then((user) =>
+      res.send({
+        userID: user.id,
+        email: user.email,
+        firstName: user.first_name,
+        lastName: user.last_name,
+        avatarID: user.avatar_id,
+      })
+    )
     .catch((err) => next(err));
 });
 

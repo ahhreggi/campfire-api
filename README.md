@@ -109,6 +109,36 @@ Response object:
 
 ---
 
+### `PATCH /api/users`
+
+Edit user details.
+
+Request object:
+
+```js
+  {
+    firstName: string,
+    lastName: string,
+    email: string,
+    password: string,
+    avatarID: number,   // valid values: 2-23, inclusive
+  }
+```
+
+Response object:
+
+```js
+  {
+    userID: number,     // user's ID
+    email: string,      // user's email
+    firstName: string,  // user's first name
+    lastName: string,   // user's last name
+    avatarID: string,   // user's avatar id
+  }
+```
+
+---
+
 ## **User Courses**
 
 ### `POST /api/join`

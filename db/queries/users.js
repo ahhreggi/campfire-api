@@ -49,6 +49,19 @@ const byEmail = function (email) {
     .then((res) => res.rows[0]);
 };
 
+const byID = function (userID) {
+  return db
+    .query(
+      `
+    SELECT id, email, first_name, last_name, avatar_id
+    FROM users
+    WHERE id = $1;
+  `,
+      [userID]
+    )
+    .then((res) => res.rows[0]);
+};
+
 /**
  *
  * @param {number} userID - The user's id.
@@ -67,4 +80,85 @@ const isAdmin = function (userID) {
     .then((res) => res.rows[0].is_admin);
 };
 
-module.exports = { create, byEmail, isAdmin, roles };
+const setFirstName = function (userID, firstName) {
+  return db
+    .query(
+      `
+    UPDATE users
+    SET first_name = $2
+    WHERE id = $1
+    RETURNING *;
+  `,
+      [userID, firstName]
+    )
+    .then((res) => res.rows[0]);
+};
+
+const setLastName = function (userID, lastName) {
+  return db
+    .query(
+      `
+    UPDATE users
+    SET last_name = $2
+    WHERE id = $1
+    RETURNING *;
+  `,
+      [userID, lastName]
+    )
+    .then((res) => res.rows[0]);
+};
+
+const setEmail = function (userID, email) {
+  return db
+    .query(
+      `
+    UPDATE users
+    SET email = $2
+    WHERE id = $1
+    RETURNING *;
+  `,
+      [userID, email]
+    )
+    .then((res) => res.rows[0]);
+};
+
+const setPassword = function (userID, password) {
+  return db
+    .query(
+      `
+    UPDATE users
+    SET password = $2
+    WHERE id = $1
+    RETURNING *;
+  `,
+      [userID, password]
+    )
+    .then((res) => res.rows[0]);
+};
+
+const setAvatar = function (userID, avatarID) {
+  return db
+    .query(
+      `
+    UPDATE users
+    SET avatar_id = $2
+    WHERE id = $1
+    RETURNING *;
+  `,
+      [userID, avatarID]
+    )
+    .then((res) => res.rows[0]);
+};
+
+module.exports = {
+  create,
+  byEmail,
+  byID,
+  isAdmin,
+  setFirstName,
+  setLastName,
+  setEmail,
+  setPassword,
+  setAvatar,
+  roles,
+};

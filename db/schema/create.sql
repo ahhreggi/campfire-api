@@ -24,7 +24,6 @@ CREATE TABLE "users" (
   "first_name" text,
   "last_name" text,
   "email" text UNIQUE,
-  "email_visible" boolean DEFAULT false,
   "password" text,
   "is_admin" boolean DEFAULT false,
   "avatar_id" int,
