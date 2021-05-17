@@ -22,11 +22,11 @@ INSERT INTO users (first_name, last_name, email, password, avatar_id) VALUES
 
 UPDATE users SET is_admin = TRUE WHERE id = 1;
 
-INSERT INTO courses (name, description, student_access_code, instructor_access_code, archived) VALUES
-('JS for Beginners', 'Introduction to core JavaScript concepts', '111111', '222222', false),
-('Raucous Ruby', 'Introduction to core Ruby concepts', '333333', '444444', false),
-('Everything HTML', 'Divs, headers, imgs - we''ll learn it all', '555555', '666666', false),
-('Archived Course', 'I am archived!', 'abc', 'def', true);
+INSERT INTO courses (name, description, student_access_code, instructor_access_code, archived, course_code) VALUES
+('JS for Beginners', 'Introduction to core JavaScript concepts', '111111', '222222', false, 'JS 101'),
+('Raucous Ruby', 'Introduction to core Ruby concepts', '333333', '444444', false, 'RUBY 101'),
+('Everything HTML', 'Divs, headers, imgs - we''ll learn it all', '555555', '666666', false, 'HTML 101'),
+('Archived Course', 'I am archived!', 'abc', 'def', true, 'ARC 000');
 
 INSERT INTO enrolments (user_id, course_id, role) VALUES
 (1, 4, 'owner'),
