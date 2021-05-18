@@ -691,6 +691,7 @@ const byID = function (courseID, userID) {
         role,
         join_date: courseJoinDate.rows[0]?.join_date || null,
         archived: courseData.rows[0].archived,
+        active: courseData.rows[0].active,
         analytics: {
           user_count: parseInt(courseData.rows[0].user_count),
           total_posts: parseInt(courseData.rows[0].total_posts),
