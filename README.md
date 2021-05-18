@@ -76,6 +76,7 @@ Response object:
     firstName: string,  // user's first name
     lastName: string,   // user's last name
     avatarID: string,   // user's avatar id
+    joinDate: timestamp,
   }
 ```
 
@@ -104,6 +105,7 @@ Response object:
     firstName: string,  // user's first name
     lastName: string,   // user's last name
     avatarID: string,   // user's avatar id
+    joinDate: timestamp,
   }
 ```
 

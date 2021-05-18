@@ -28,18 +28,25 @@ router.post("/register", (req, res, next) => {
     .then((result) => {
       if (result.length > 0) {
         // Save was successful
+        const token = jwt.sign(
+          { id: result[0].id },
+          process.env.JWT_SECRET_KEY
+        );
         const userID = result[0].id;
         const email = result[0].email;
         const firstName = result[0].first_name;
         const lastName = result[0].last_name;
         const avatarID = result[0].avatar_id;
-        const token = jwt.sign(
-          { id: result[0].id },
-          process.env.JWT_SECRET_KEY
-        );
-        res
-          .status(200)
-          .send({ token, userID, email, firstName, lastName, avatarID });
+        const joinDate = result[0].created_at;
+        res.status(200).send({
+          token,
+          userID,
+          email,
+          firstName,
+          lastName,
+          avatarID,
+          joinDate,
+        });
       } else {
         next({
           status: 500,
@@ -89,9 +96,16 @@ router.post("/login", (req, res, next) => {
         const firstName = user.first_name;
         const lastName = user.last_name;
         const avatarID = user.avatar_id;
-        res
-          .status(200)
-          .send({ token, userID, email, firstName, lastName, avatarID });
+        const joinDate = user.created_at;
+        res.status(200).send({
+          token,
+          userID,
+          email,
+          firstName,
+          lastName,
+          avatarID,
+          joinDate,
+        });
       } else {
         // Invalid password
         next({ status: 401, message: "Invalid password" });
