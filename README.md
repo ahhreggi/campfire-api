@@ -412,7 +412,9 @@ Request object:
   ],
   archive: boolean,
   roles: {
-    targetUserID: targetRole, // targetRole can be 'student', 'instructor', 'owner', or null to remove user from course
+    targetUserID: targetRole, // targetRole can be 'student', 'instructor', 'owner', or null to remove user from course eg:
+    // "10": null,
+    // "4": "instructor",
   }
 
 }
