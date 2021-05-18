@@ -129,16 +129,18 @@ const forUser = function (userID) {
       for (course of courses) {
         queries.push(byID(course.id, userID));
       }
-      return Promise.all(queries);
+      return Promise.allSettled(queries);
     })
     .then((courseData) =>
-      courseData.map((course) => {
-        delete course.secrets;
-        delete course.users;
-        delete course.tags;
-        delete course.posts;
-        return course;
-      })
+      courseData
+        .filter((course) => course.status === "fulfilled")
+        .map((course) => {
+          delete course.secrets;
+          delete course.users;
+          delete course.tags;
+          delete course.posts;
+          return course;
+        })
     );
 };
 
