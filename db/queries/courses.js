@@ -30,7 +30,8 @@ const users = function (courseID) {
         users.first_name AS first_name,
         users.last_name AS last_name,
         users.avatar_id AS avatar_id,
-        enrolments.role AS role
+        enrolments.role AS role,
+        enrolments.active
       FROM courses
       INNER JOIN enrolments ON courses.id = course_id
       INNER JOIN users ON user_id = users.id

@@ -170,7 +170,8 @@ router.patch("/courses/:id", (req, res, next) => {
           ) {
             return Promise.reject({
               status: 400,
-              message: "Can only set roles: student, instructor, owner",
+              message:
+                "Can only set roles: 'student', 'instructor', 'owner', or null",
             });
           }
           if (roles[role] === "owner") owners += 1;
