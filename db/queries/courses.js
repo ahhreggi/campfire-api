@@ -34,7 +34,8 @@ const users = function (courseID) {
       FROM courses
       INNER JOIN enrolments ON courses.id = course_id
       INNER JOIN users ON user_id = users.id
-      WHERE courses.id = $1;
+      WHERE courses.id = $1
+      AND enrolments.active = TRUE;
   `,
       [courseID]
     )
@@ -346,22 +347,65 @@ const archive = function (courseID, archive) {
 };
 
 const updateRole = function (courseID, userID, role) {
-  // Delete the existing role
+  // Check user is in course and not an owner
   return db
     .query(
       `
-      DELETE FROM enrolments
-      WHERE user_id = $2
-      AND course_id = $1
-      RETURNING *;
-    `,
+    SELECT * FROM enrolments
+    WHERE course_id = $1
+    AND user_id = $2
+    AND active = TRUE;
+  `,
       [courseID, userID]
     )
-    .then(() => {
-      // If we received a new role, insert it
-      if (role !== null) {
-        return enrol(userID, courseID, role);
+    .then((res) => {
+      if (res.rows.length === 0) {
+        // User is not enrolled / inactive
+        return Promise.reject({
+          status: 400,
+          message: `User ${userID} is not enrolled in course ${courseID}`,
+        });
       }
+
+      if (res.rows[0].role === "owner") {
+        // Owner cannot be manually assigned different role - must hand off ownership
+        return Promise.reject({
+          status: 400,
+          message: "Cannot change owner's role - please set a new owner",
+        });
+      }
+
+      const queries = [];
+
+      // If setting new owner, downgrade current to 'instructor'
+      if (role === "owner") {
+        queries.push(
+          db.query(
+            `
+          UPDATE enrolments
+          SET role = 'instructor'
+          WHERE course_id = $1
+          AND role = 'owner';
+        `,
+            [courseID]
+          )
+        );
+      }
+      // Update the role for the given user
+      queries.push(
+        db.query(
+          `
+          UPDATE enrolments
+          SET role = $3
+          WHERE user_id = $2
+          AND course_id = $1
+          RETURNING *;
+        `,
+          [courseID, userID, role]
+        )
+      );
+
+      return Promise.all(queries);
     });
 };
 

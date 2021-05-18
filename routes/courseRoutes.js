@@ -159,8 +159,9 @@ router.patch("/courses/:id", (req, res, next) => {
             message: "Instructors cannot edit course roles",
           });
 
-        // Check all roles provided are valid
+        let owners = 0;
         for (role in roles) {
+          // Check all roles provided are valid
           if (
             roles[role] !== null &&
             roles[role] !== "student" &&
@@ -172,6 +173,15 @@ router.patch("/courses/:id", (req, res, next) => {
               message: "Can only set roles: student, instructor, owner",
             });
           }
+          if (roles[role] === "owner") owners += 1;
+        }
+
+        // Check max 1 owner is being set
+        if (owners > 1) {
+          return Promise.reject({
+            status: 400,
+            message: "Can only set 1 owner",
+          });
         }
 
         // Update the roles
