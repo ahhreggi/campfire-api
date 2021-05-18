@@ -134,7 +134,7 @@ const forUser = function (userID) {
     .then((courseData) =>
       courseData
         .filter((course) => course.status === "fulfilled")
-        .map((course) => {
+        .map(({ value: course }) => {
           delete course.secrets;
           delete course.users;
           delete course.tags;
