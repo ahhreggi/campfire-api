@@ -186,9 +186,13 @@ router.patch("/courses/:id", (req, res, next) => {
 
         // Update the roles
         for (role in roles) {
-          queries.push(
-            Courses.updateRole(courseID, parseInt(role), roles[role])
-          );
+          if (roles[role] !== null) {
+            queries.push(
+              Courses.updateRole(courseID, parseInt(role), roles[role])
+            );
+          } else {
+            Courses.unenrol(courseID, parseInt(role));
+          }
         }
       }
 
