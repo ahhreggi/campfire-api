@@ -37,7 +37,7 @@ const create = function (post) {
           )
         );
       }
-      return Promise.all([Promise.resolve(post), tagInserts]);
+      return Promise.all([Promise.resolve(post), ...tagInserts]);
     })
     .then((res) => res[0]);
 };
