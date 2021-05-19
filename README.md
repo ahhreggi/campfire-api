@@ -111,7 +111,7 @@ Response object:
 
 ---
 
-### `PATCH /api/users`
+### `PATCH /api/user`
 
 Edit user details.
 
