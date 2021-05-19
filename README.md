@@ -186,6 +186,9 @@ Request object:
     name: string,         // new course name
     description: string,  // new course description (optional)
     courseCode: string,  // 8-char max
+    tags: [
+      tag: string,
+    ]
   }
 ```
 

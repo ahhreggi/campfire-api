@@ -40,9 +40,15 @@ router.post("/courses/:id/leave", (req, res, next) => {
 // Creates a new course
 router.post("/create", (req, res, next) => {
   const { id: userID } = res.locals.decodedToken;
-  const { name, description, courseCode } = req.body;
+  const { name, description, courseCode, tags } = req.body;
 
   if (!name) return next({ status: 400, message: "Course name is required" });
+  if (tags && !(tags instanceof Array)) {
+    return next({
+      status: 400,
+      message: "Tags must be an array of strings - course creation aborted",
+    });
+  }
 
   // Generate the access codes
   const courseData = {
@@ -51,6 +57,7 @@ router.post("/create", (req, res, next) => {
     courseCode,
     studentAccessCode: uuid.v4(),
     instructorAccessCode: uuid.v4(),
+    tags,
   };
 
   // Insert the new course

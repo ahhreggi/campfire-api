@@ -246,6 +246,7 @@ const create = function (courseData) {
     courseCode,
     studentAccessCode,
     instructorAccessCode,
+    tags,
   } = courseData;
   return db
     .query(
@@ -256,7 +257,26 @@ const create = function (courseData) {
   `,
       [name, description, courseCode, studentAccessCode, instructorAccessCode]
     )
-    .then((res) => res.rows[0]);
+    .then((course) => {
+      const queries = [];
+      const courseID = course.rows[0].id;
+      if (tags) {
+        // Insert these into db
+        for (tag of tags) {
+          queries.push(
+            db.query(
+              `
+            INSERT INTO tags (course_id, name)
+            VALUES ($1, $2);
+          `,
+              [courseID, tag]
+            )
+          );
+        }
+      }
+      return Promise.all([Promise.resolve(course), ...queries]);
+    })
+    .then((res) => res[0].rows[0]);
 };
 
 const updateTags = function (courseID, newTags) {
